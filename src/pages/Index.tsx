@@ -10,13 +10,20 @@ import {
   ArrowRight,
   Waves,
   Building2,
-  Mountain
+  Mountain,
+  Bot,
+  MessageCircle
 } from 'lucide-react';
 import { isFirstVisit } from '@/lib/storage';
 import { useAnalytics } from '@/lib/analytics';
 import { useEffect } from 'react';
 
 const features = [
+  {
+    icon: Bot,
+    title: 'AI Travel Agent',
+    description: 'Chat with our AI to plan your perfect trip automatically',
+  },
   {
     icon: MapPin,
     title: 'All 7 Emirates',
@@ -31,11 +38,6 @@ const features = [
     icon: DollarSign,
     title: 'Budget Tracking',
     description: 'Stay on budget with real-time cost estimates',
-  },
-  {
-    icon: Sparkles,
-    title: 'Personalized',
-    description: 'Itineraries tailored to your travel style',
   },
 ];
 
@@ -58,6 +60,12 @@ export default function Index() {
     analytics.trackClick('start_planning_button', 'hero_section');
     analytics.trackFeature('trip_planning', 'start');
     navigate('/onboarding');
+  };
+
+  const handleStartAIChat = () => {
+    analytics.trackClick('start_ai_chat_button', 'hero_section');
+    analytics.trackFeature('ai_chat', 'start');
+    navigate('/ai-chat');
   };
 
   const handleViewTrips = () => {
@@ -105,6 +113,15 @@ export default function Index() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
+            <Button
+              size="lg"
+              onClick={handleStartAIChat}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 gap-2 text-lg px-8 py-6 rounded-xl shadow-xl"
+            >
+              <Bot className="w-5 h-5" />
+              Chat with AI Travel Agent
+              <MessageCircle className="w-5 h-5" />
+            </Button>
             <Button
               size="lg"
               onClick={handleStartPlanning}

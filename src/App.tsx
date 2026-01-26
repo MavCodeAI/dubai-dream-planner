@@ -16,6 +16,7 @@ import Pricing from "./pages/Pricing";
 import Print from "./pages/Print";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
+import AgenticChat from "./components/AgenticChat";
 import { isFirstVisit, markFirstVisitComplete } from "@/lib/storage";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ function AppWrapper() {
         <Routes>
           <Route path="/" element={shouldRedirectToOnboarding ? <Navigate to="/onboarding" replace /> : <Index />} />
           <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/ai-chat" element={<AgenticChat />} />
           <Route path="/itinerary" element={<Itinerary />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/trips" element={<Trips />} />
