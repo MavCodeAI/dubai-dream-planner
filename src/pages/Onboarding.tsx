@@ -7,7 +7,6 @@ import { DatesStep } from '@/components/onboarding/DatesStep';
 import { TravelersStep } from '@/components/onboarding/TravelersStep';
 import { BudgetStep } from '@/components/onboarding/BudgetStep';
 import { InterestsStep } from '@/components/onboarding/InterestsStep';
-import { ItinerarySkeleton } from '@/components/LoadingStates';
 import { OnboardingData } from '@/types';
 import { saveOnboardingData, saveCurrentTrip, getOnboardingData } from '@/lib/storage';
 import { generateItinerary } from '@/lib/itinerary-generator';
@@ -107,15 +106,19 @@ export default function Onboarding() {
       setIsGenerating(true);
       saveOnboardingData(data);
       
-      // Add fake delay for UX polish
-      await new Promise(resolve => setTimeout(resolve, 2500));
-      
-      const trip = generateItinerary(data);
-      saveCurrentTrip(trip);
-      toast.success('Your perfect UAE itinerary has been generated! 🎉', {
-        description: 'Get ready for an amazing adventure through the Emirates'
-      });
-      navigate('/itinerary');
+      try {
+        const trip = await generateItinerary(data);
+        saveCurrentTrip(trip);
+        toast.success('Your perfect UAE itinerary has been generated! 🎉', {
+          description: 'Get ready for an amazing adventure through the Emirates'
+        });
+        navigate('/itinerary');
+      } catch (error) {
+        toast.error('Failed to generate itinerary', {
+          description: 'Please try again later'
+        });
+        setIsGenerating(false);
+      }
     }
   };
 

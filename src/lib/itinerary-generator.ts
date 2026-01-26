@@ -1,6 +1,7 @@
 import { Activity, DayPlan, OnboardingData, Trip } from '@/types';
 import { MOCK_ACTIVITIES } from '@/data/activities';
 import { generateId } from './storage';
+import { aiClient } from './ai-client';
 import { eachDayOfInterval, parseISO, format } from 'date-fns';
 
 const PACE_ACTIVITIES = {
@@ -22,7 +23,6 @@ function filterActivities(
   activities: Activity[],
   cities: string[],
   interests: string[],
-  tripType: string,
   hasChildren: boolean
 ): Activity[] {
   return activities.filter(activity => {
@@ -61,7 +61,6 @@ function selectActivitiesForDay(
     
     const slotActivities = shuffledActivities.filter(
       a => (a.timeOfDay === timeSlot || a.timeOfDay === 'anytime') && 
-           !usedActivityIds.has(a.id) &&
            !selectedActivities.find(s => s.id === a.id) &&
            dailyCost + a.estimatedCostUSD <= maxBudget
     );
@@ -74,11 +73,10 @@ function selectActivitiesForDay(
     }
   }
   
-  // Fill remaining slots if needed
+  // Fill remaining slots if needed (allow duplicates if necessary)
   while (selectedActivities.length < min) {
     const remaining = shuffledActivities.filter(
-      a => !usedActivityIds.has(a.id) &&
-           !selectedActivities.find(s => s.id === a.id) &&
+      a => !selectedActivities.find(s => s.id === a.id) &&
            dailyCost + a.estimatedCostUSD <= maxBudget
     );
     
@@ -95,7 +93,7 @@ function selectActivitiesForDay(
   return selectedActivities.sort((a, b) => timeOrder[a.timeOfDay] - timeOrder[b.timeOfDay]);
 }
 
-export function generateItinerary(onboardingData: OnboardingData): Trip {
+export async function generateItinerary(onboardingData: OnboardingData): Promise<Trip> {
   const {
     cities,
     startDate,
@@ -108,8 +106,64 @@ export function generateItinerary(onboardingData: OnboardingData): Trip {
     pace,
   } = onboardingData;
   
+  try {
+    // Try AI generation first
+    console.log('Attempting AI itinerary generation...');
+    const aiResponse = await aiClient.generateItinerary({
+      cities,
+      startDate,
+      endDate,
+      adults,
+      children,
+      budget: budgetUSD,
+      interests,
+      pace,
+      tripType
+    });
+
+    // Convert AI response to Trip format
+    const trip: Trip = {
+      id: generateId(),
+      name: `UAE Adventure - ${format(parseISO(startDate), 'MMM d')} to ${format(parseISO(endDate), 'MMM d, yyyy')}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      onboardingData,
+      days: aiResponse.days.map(day => ({
+        ...day,
+        activities: day.activities.map(activity => ({
+          ...activity,
+          city: activity.city || day.city,
+          tags: activity.tags || [],
+          familyFriendly: activity.familyFriendly ?? true,
+          luxuryLevel: activity.luxuryLevel || 'budget'
+        }))
+      })),
+      totalCostUSD: aiResponse.totalCostUSD,
+    };
+
+    console.log('AI itinerary generated successfully');
+    return trip;
+  } catch (error) {
+    console.warn('AI generation failed, falling back to mock data:', error);
+    
+    // Fallback to original mock-based generation
+    return generateMockItinerary(onboardingData);
+  }
+}
+
+// Original mock-based generation as fallback
+function generateMockItinerary(onboardingData: OnboardingData): Trip {
+  const {
+    cities,
+    startDate,
+    endDate,
+    children,
+    budgetUSD,
+    interests,
+    pace,
+  } = onboardingData;
+  
   const hasChildren = children > 0;
-  const totalTravelers = adults + children;
   
   // Calculate dates
   const days = eachDayOfInterval({
@@ -126,7 +180,6 @@ export function generateItinerary(onboardingData: OnboardingData): Trip {
     MOCK_ACTIVITIES,
     cities,
     interests,
-    tripType,
     hasChildren
   );
   
@@ -142,12 +195,30 @@ export function generateItinerary(onboardingData: OnboardingData): Trip {
     // Get activities for this city
     const cityActivities = eligibleActivities.filter(a => a.city === city);
     
-    const selectedActivities = selectActivitiesForDay(
+    // Calculate available activities per day (distribute evenly)
+    const totalDays = days.length;
+    const activitiesPerDay = Math.ceil(cityActivities.length / totalDays);
+    const adjustedMaxBudget = Math.max(dailyBudget, activitiesPerDay * 20); // Ensure budget allows activities
+    
+    let selectedActivities = selectActivitiesForDay(
       cityActivities,
       usedActivityIds,
       pace,
-      dailyBudget
+      adjustedMaxBudget
     );
+    
+    // EMERGENCY FALLBACK: If no activities selected, add at least one
+    if (selectedActivities.length === 0 && cityActivities.length > 0) {
+      // Find the cheapest available activity
+      const fallbackActivity = cityActivities
+        .filter(a => a.estimatedCostUSD <= dailyBudget)
+        .sort((a, b) => a.estimatedCostUSD - b.estimatedCostUSD)[0];
+      
+      if (fallbackActivity) {
+        selectedActivities = [fallbackActivity];
+        usedActivityIds.add(fallbackActivity.id);
+      }
+    }
     
     const dailyCost = selectedActivities.reduce(
       (sum, a) => sum + a.estimatedCostUSD,
@@ -178,7 +249,64 @@ export function generateItinerary(onboardingData: OnboardingData): Trip {
   return trip;
 }
 
-export function regenerateDay(trip: Trip, dayNumber: number): Trip {
+export async function regenerateDay(trip: Trip, dayNumber: number): Promise<Trip> {
+  const dayIndex = dayNumber - 1;
+  const day = trip.days[dayIndex];
+  
+  if (!day) return trip;
+  
+  try {
+    // Try AI regeneration first
+    console.log(`Attempting AI regeneration for Day ${dayNumber}...`);
+    const suggestions = await aiClient.getSuggestions({
+      currentActivities: day.activities,
+      remainingBudget: trip.onboardingData.budgetUSD - trip.totalCostUSD + day.dailyCostUSD,
+      city: day.city,
+      dayNumber,
+      interests: trip.onboardingData.interests,
+      hasChildren: trip.onboardingData.children > 0
+    });
+
+    // Convert AI suggestions to new activities
+    const newActivities = suggestions.suggestions.slice(0, 4).map(suggestion => ({
+      id: `ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      name: suggestion.name,
+      city: day.city,
+      description: suggestion.description,
+      durationHours: suggestion.durationHours,
+      estimatedCostUSD: suggestion.estimatedCostUSD,
+      tags: suggestion.tags,
+      timeOfDay: suggestion.timeOfDay,
+      familyFriendly: suggestion.familyFriendly,
+      luxuryLevel: 'budget' as const
+    }));
+
+    const updatedDays = [...trip.days];
+    updatedDays[dayIndex] = {
+      ...day,
+      activities: newActivities,
+      dailyCostUSD: newActivities.reduce((sum, a) => sum + a.estimatedCostUSD, 0),
+    };
+
+    const totalCost = updatedDays.reduce((sum, d) => sum + d.dailyCostUSD, 0);
+
+    console.log(`Day ${dayNumber} regenerated successfully with AI`);
+    return {
+      ...trip,
+      days: updatedDays,
+      totalCostUSD: totalCost,
+      updatedAt: new Date().toISOString(),
+    };
+  } catch (error) {
+    console.warn(`AI regeneration failed for Day ${dayNumber}, falling back to mock data:`, error);
+    
+    // Fallback to original mock-based regeneration
+    return regenerateDayMock(trip, dayNumber);
+  }
+}
+
+// Original mock-based regeneration as fallback
+function regenerateDayMock(trip: Trip, dayNumber: number): Trip {
   const dayIndex = dayNumber - 1;
   const day = trip.days[dayIndex];
   
@@ -199,7 +327,6 @@ export function regenerateDay(trip: Trip, dayNumber: number): Trip {
     MOCK_ACTIVITIES,
     [day.city],
     onboardingData.interests,
-    onboardingData.tripType,
     hasChildren
   );
   

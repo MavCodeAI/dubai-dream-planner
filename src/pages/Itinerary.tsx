@@ -149,16 +149,20 @@ export default function Itinerary() {
     
     setRegeneratingDay(dayNumber);
     
-    // Add fake delay for UX polish
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    const updated = regenerateDay(trip, dayNumber);
-    setTrip(updated);
-    saveCurrentTrip(updated);
-    setRegeneratingDay(null);
-    toast.success(`Day ${dayNumber} regenerated successfully!`, {
+    try {
+      const updated = await regenerateDay(trip, dayNumber);
+      setTrip(updated);
+      saveCurrentTrip(updated);
+      toast.success(`Day ${dayNumber} regenerated successfully!`, {
         description: 'New activities have been generated for this day'
       });
+    } catch (error) {
+      toast.error('Failed to regenerate day', {
+        description: 'Please try again later'
+      });
+    } finally {
+      setRegeneratingDay(null);
+    }
   };
 
   const handleSaveTrip = () => {
