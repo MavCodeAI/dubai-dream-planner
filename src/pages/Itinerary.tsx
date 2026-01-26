@@ -139,12 +139,13 @@ export default function Itinerary() {
   };
 
   const handleExportPDF = () => {
-    if (!canExportPDF()) {
+    if (!isPro) {
       setUpgradeFeature('export PDF');
       setShowUpgradeModal(true);
       return;
     }
-    navigate('/print');
+    // Open print route in new tab for Pro users
+    window.open('/print', '_blank');
   };
 
   const handleUpgrade = () => {

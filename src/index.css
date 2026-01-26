@@ -223,16 +223,817 @@
 
 /* Print styles */
 @media print {
-  .no-print {
+  /* Hide all non-print elements */
+  .no-print,
+  .no-print-controls,
+  header:not(.print-header),
+  footer:not(.print-footer),
+  nav,
+  button,
+  .btn,
+  .interactive-element {
     display: none !important;
   }
 
+  /* Reset body and container */
   body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+    line-height: 1.4;
+    margin: 0;
+    padding: 0;
+    font-family: 'Georgia', 'Times New Roman', serif !important;
+  }
+
+  /* Print container */
+  .print-container {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
     background: white !important;
     color: black !important;
   }
 
-  .print-break {
+  /* Header styles */
+  .print-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2pt solid #333;
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .trip-title h1 {
+    font-size: 24pt;
+    font-weight: bold;
+    margin: 0 0 0.5rem 0;
+    color: black;
+  }
+
+  .trip-dates {
+    font-size: 11pt;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .brand-mark .logo-text {
+    font-size: 10pt;
+    font-weight: bold;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Section headings */
+  h2 {
+    font-size: 16pt;
+    font-weight: bold;
+    margin: 1.5rem 0 1rem 0;
+    color: black;
+    border-bottom: 1pt solid #ccc;
+    padding-bottom: 0.5rem;
+  }
+
+  h3 {
+    font-size: 14pt;
+    font-weight: bold;
+    margin: 1rem 0 0.5rem 0;
+    color: black;
+  }
+
+  h4 {
+    font-size: 12pt;
+    font-weight: bold;
+    margin: 0.5rem 0 0.25rem 0;
+    color: black;
+  }
+
+  /* Trip summary */
+  .trip-summary .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .summary-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border: 1pt solid #ddd;
+    border-radius: 4pt;
+    background: #f9f9f9;
+  }
+
+  .summary-item .icon {
+    width: 16pt;
+    height: 16pt;
+    color: #333;
+    flex-shrink: 0;
+  }
+
+  .summary-item label {
+    display: block;
+    font-size: 9pt;
+    font-weight: bold;
+    color: #666;
+    margin-bottom: 0.25rem;
+  }
+
+  .summary-item span {
+    font-size: 10pt;
+    color: black;
+  }
+
+  /* Budget overview */
+  .budget-cards {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .budget-card {
+    flex: 1;
+    padding: 1rem;
+    border: 1pt solid #ddd;
+    border-radius: 4pt;
+    text-align: center;
+    background: #f9f9f9;
+  }
+
+  .budget-card.total {
+    background: #e8f4fd;
+    border-color: #2196F3;
+  }
+
+  .budget-card.spent {
+    background: #fff3e0;
+    border-color: #ff9800;
+  }
+
+  .budget-card.remaining.positive {
+    background: #e8f5e8;
+    border-color: #4caf50;
+  }
+
+  .budget-card.remaining.negative {
+    background: #ffebee;
+    border-color: #f44336;
+  }
+
+  .card-label {
+    font-size: 9pt;
+    font-weight: bold;
+    color: #666;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-value {
+    font-size: 14pt;
+    font-weight: bold;
+    color: black;
+  }
+
+  /* Day sections */
+  .day-section {
+    margin-bottom: 2rem;
+    page-break-inside: avoid;
+  }
+
+  .day-section.page-break {
     page-break-before: always;
   }
+
+  .day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem;
+    border: 1pt solid #ddd;
+    border-radius: 4pt;
+    background: #f5f5f5;
+    margin-bottom: 1rem;
+  }
+
+  .day-details {
+    font-size: 10pt;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .cost-label {
+    font-size: 9pt;
+    color: #666;
+    display: block;
+  }
+
+  .cost-value {
+    font-size: 12pt;
+    font-weight: bold;
+    color: black;
+  }
+
+  /* Activities */
+  .activity-list {
+    border: 1pt solid #ddd;
+    border-radius: 4pt;
+    overflow: hidden;
+  }
+
+  .activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-bottom: 1pt solid #eee;
+    page-break-inside: avoid;
+  }
+
+  .activity-item:last-child {
+    border-bottom: none;
+  }
+
+  .activity-time {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: 60pt;
+    text-align: center;
+  }
+
+  .time-slot {
+    font-size: 9pt;
+    font-weight: bold;
+    text-transform: capitalize;
+    color: #333;
+  }
+
+  .duration {
+    font-size: 8pt;
+    color: #666;
+  }
+
+  .activity-content {
+    flex: 1;
+  }
+
+  .activity-name {
+    font-size: 11pt;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+  }
+
+  .activity-description {
+    font-size: 9pt;
+    color: #666;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .activity-cost {
+    font-size: 10pt;
+    font-weight: bold;
+    color: black;
+    min-width: 40pt;
+    text-align: right;
+  }
+
+  .no-activities {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    font-style: italic;
+  }
+
+  /* Footer */
+  .print-footer {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1pt solid #ccc;
+  }
+
+  .footer-content {
+    text-align: center;
+  }
+
+  .brand-info {
+    font-size: 10pt;
+    color: #666;
+    margin-bottom: 0.5rem;
+  }
+
+  .separator {
+    margin: 0 0.5rem;
+  }
+
+  .tagline {
+    font-size: 9pt;
+    font-style: italic;
+    color: #999;
+  }
+
+  /* Positive/negative colors */
+  .positive {
+    color: #2e7d32 !important;
+  }
+
+  .negative {
+    color: #c62828 !important;
+  }
+
+  /* Page setup */
+  @page {
+    margin: 1in;
+    size: A4;
+  }
+
+  @page :first {
+    margin-top: 0.5in;
+  }
+
+  /* Ensure no elements are cut off */
+  * {
+    page-break-inside: auto;
+  }
+
+  /* Avoid breaking after headings */
+  h1, h2, h3, h4 {
+    page-break-after: avoid;
+  }
+
+  /* Avoid breaking before these elements */
+  .day-section,
+  .activity-item {
+    page-break-before: auto;
+  }
+
+  /* Links */
+  a {
+    color: black !important;
+    text-decoration: none !important;
+  }
+
+  /* Icons - hide in print */
+  .icon {
+    display: none !important;
+  }
+
+  /* Screen-only controls */
+  .no-print-controls {
+    display: none !important;
+  }
+}
+
+/* Screen styles for print page */
+.print-container {
+  min-height: 100vh;
+  background: white;
+  color: black;
+  font-family: 'Inter', system-ui, sans-serif;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.print-header {
+  margin-bottom: 2rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.trip-title h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  color: #1a1a1a;
+}
+
+.trip-dates {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  font-size: 1rem;
+}
+
+.brand-mark .logo-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.trip-summary {
+  margin-bottom: 2rem;
+}
+
+.trip-summary h2,
+.budget-overview h2,
+.itinerary h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1a1a1a;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.summary-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+.summary-item .icon {
+  width: 20px;
+  height: 20px;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.summary-item label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.summary-item span {
+  font-size: 0.875rem;
+  color: #1a1a1a;
+}
+
+.budget-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.budget-card {
+  padding: 1.5rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.budget-card.total {
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  border-color: #2196f3;
+}
+
+.budget-card.spent {
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  border-color: #ff9800;
+}
+
+.budget-card.remaining.positive {
+  background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+  border-color: #4caf50;
+}
+
+.budget-card.remaining.negative {
+  background: linear-gradient(135deg, #ffebee, #ffcdd2);
+  border-color: #f44336;
+}
+
+.card-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.card-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.day-section {
+  margin-bottom: 3rem;
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: #f8f9fa;
+  margin-bottom: 1rem;
+}
+
+.day-details {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.cost-label {
+  font-size: 0.75rem;
+  color: #666;
+  display: block;
+}
+
+.cost-value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.activity-list {
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 80px;
+  text-align: center;
+}
+
+.time-slot {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: #1a1a1a;
+}
+
+.duration {
+  font-size: 0.625rem;
+  color: #666;
+}
+
+.activity-content {
+  flex: 1;
+}
+
+.activity-name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: #1a1a1a;
+}
+
+.activity-description {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.activity-cost {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  min-width: 50px;
+  text-align: right;
+}
+
+.no-activities {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-style: italic;
+}
+
+.print-footer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e5e5;
+}
+
+.footer-content {
+  text-align: center;
+}
+
+.brand-info {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.separator {
+  margin: 0 0.5rem;
+}
+
+.tagline {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: #999;
+}
+
+.no-print-controls {
+  margin-top: 2rem;
+  padding: 2rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: #f8f9fa;
+}
+
+.print-btn {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  background: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.print-btn:hover {
+  background: #1976d2;
+}
+
+.upgrade-prompt {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  color: #856404;
+}
+
+.upgrade-btn {
+  padding: 0.5rem 1rem;
+  background: #ffc107;
+  color: #212529;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.upgrade-btn:hover {
+  background: #e0a800;
+}
+
+.back-btn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  background: #5a6268;
+}
+
+.positive {
+  color: #2e7d32;
+}
+
+.negative {
+  color: #c62828;
+}
+
+/* Page transitions */
+.page-transition {
+  animation: pageSlideIn 0.3s ease-out;
+}
+
+@keyframes pageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Skeleton loaders */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-line {
+  height: 16px;
+  margin-bottom: 8px;
+}
+
+.skeleton-line.small {
+  height: 12px;
+  width: 60%;
+}
+
+.skeleton-line.large {
+  height: 20px;
+  width: 80%;
+}
+
+.skeleton-card {
+  height: 120px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.skeleton-activity {
+  height: 80px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.skeleton-button {
+  height: 40px;
+  width: 120px;
+  border-radius: 6px;
+}
+
+/* Loading states */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

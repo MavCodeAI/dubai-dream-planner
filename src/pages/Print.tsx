@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCurrentTrip } from '@/lib/storage';
+import { getCurrentTrip, isProUser } from '@/lib/storage';
 import { Trip, EMIRATES } from '@/types';
 import { format, parseISO } from 'date-fns';
+import { Crown, Calendar, Users, MapPin, DollarSign, Clock } from 'lucide-react';
 
 export default function Print() {
   const navigate = useNavigate();
   const [trip, setTrip] = useState<Trip | null>(null);
+  const [isPro, setIsPro] = useState(false);
 
   useEffect(() => {
     const currentTrip = getCurrentTrip();
@@ -15,11 +17,14 @@ export default function Print() {
       return;
     }
     setTrip(currentTrip);
+    setIsPro(isProUser());
     
-    // Trigger print dialog after a short delay
-    setTimeout(() => {
-      window.print();
-    }, 500);
+    // Auto-trigger print for Pro users after content loads
+    if (isProUser()) {
+      setTimeout(() => {
+        window.print();
+      }, 500);
+    }
   }, [navigate]);
 
   if (!trip) return null;
@@ -29,136 +34,167 @@ export default function Print() {
   };
 
   const { onboardingData, days, totalCostUSD } = trip;
+  const remainingBudget = onboardingData.budgetUSD - totalCostUSD;
+  const budgetStatus = remainingBudget >= 0 ? 'positive' : 'negative';
 
   return (
-    <div className="p-8 max-w-4xl mx-auto bg-white text-black print:text-black">
-      {/* Header */}
-      <div className="text-center mb-8 pb-6 border-b-2 border-gray-200">
-        <h1 className="text-3xl font-bold mb-2">{trip.name}</h1>
-        <p className="text-gray-600">
-          {format(parseISO(onboardingData.startDate), 'MMMM d, yyyy')} -{' '}
-          {format(parseISO(onboardingData.endDate), 'MMMM d, yyyy')}
-        </p>
-      </div>
-
-      {/* Trip Summary */}
-      <div className="mb-8 p-6 bg-gray-50 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">Trip Summary</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div>
-            <span className="text-gray-600 block">Travelers</span>
-            <span className="font-medium">
-              {onboardingData.adults} adults, {onboardingData.children} children
-            </span>
+    <div className="print-container">
+      {/* Header Section */}
+      <header className="print-header">
+        <div className="header-content">
+          <div className="trip-title">
+            <h1>{trip.name}</h1>
+            <div className="trip-dates">
+              <Calendar className="w-4 h-4" />
+              {format(parseISO(onboardingData.startDate), 'MMMM d, yyyy')} - {' '}
+              {format(parseISO(onboardingData.endDate), 'MMMM d, yyyy')}
+            </div>
           </div>
-          <div>
-            <span className="text-gray-600 block">Cities</span>
-            <span className="font-medium">
-              {onboardingData.cities.map(getCityName).join(', ')}
-            </span>
-          </div>
-          <div>
-            <span className="text-gray-600 block">Total Budget</span>
-            <span className="font-medium">${onboardingData.budgetUSD.toLocaleString()}</span>
-          </div>
-          <div>
-            <span className="text-gray-600 block">Estimated Cost</span>
-            <span className="font-medium">${totalCostUSD.toLocaleString()}</span>
+          <div className="brand-mark">
+            <div className="logo">
+              <span className="logo-text">UAE Tour Planner</span>
+            </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Day by Day Itinerary */}
-      <div className="space-y-6">
-        <h2 className="text-xl font-semibold">Day-by-Day Itinerary</h2>
-        
-        {days.map((day) => (
-          <div key={day.dayNumber} className="border border-gray-200 rounded-lg overflow-hidden print-break">
-            <div className="bg-gray-100 px-4 py-3 flex justify-between items-center">
-              <div>
-                <span className="font-semibold">Day {day.dayNumber}</span>
-                <span className="text-gray-600 ml-2">
-                  {format(parseISO(day.date), 'EEEE, MMMM d')}
-                </span>
-                <span className="text-gray-600 ml-2">• {getCityName(day.city)}</span>
-              </div>
-              <span className="font-medium">${day.dailyCostUSD}</span>
+      {/* Trip Summary */}
+      <section className="trip-summary">
+        <h2>Trip Overview</h2>
+        <div className="summary-grid">
+          <div className="summary-item">
+            <Users className="icon" />
+            <div>
+              <label>Travelers</label>
+              <span>{onboardingData.adults} adults, {onboardingData.children} children</span>
             </div>
-            
-            <div className="p-4">
+          </div>
+          <div className="summary-item">
+            <MapPin className="icon" />
+            <div>
+              <label>Cities</label>
+              <span>{onboardingData.cities.map(getCityName).join(', ')}</span>
+            </div>
+          </div>
+          <div className="summary-item">
+            <DollarSign className="icon" />
+            <div>
+              <label>Total Budget</label>
+              <span>${onboardingData.budgetUSD.toLocaleString()}</span>
+            </div>
+          </div>
+          <div className="summary-item">
+            <DollarSign className="icon" />
+            <div>
+              <label>Estimated Cost</label>
+              <span className={budgetStatus === 'positive' ? 'positive' : 'negative'}>
+                ${totalCostUSD.toLocaleString()}
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Budget Overview */}
+      <section className="budget-overview">
+        <h2>Budget Summary</h2>
+        <div className="budget-cards">
+          <div className="budget-card total">
+            <div className="card-label">Total Budget</div>
+            <div className="card-value">${onboardingData.budgetUSD.toLocaleString()}</div>
+          </div>
+          <div className="budget-card spent">
+            <div className="card-label">Estimated Spend</div>
+            <div className="card-value">${totalCostUSD.toLocaleString()}</div>
+          </div>
+          <div className={`budget-card remaining ${budgetStatus}`}>
+            <div className="card-label">Remaining</div>
+            <div className="card-value">
+              ${Math.abs(remainingBudget).toLocaleString()}
+              {budgetStatus === 'negative' && ' over'}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Day-by-Day Itinerary */}
+      <section className="itinerary">
+        <h2>Detailed Itinerary</h2>
+        {days.map((day, dayIndex) => (
+          <div key={day.dayNumber} className={`day-section ${dayIndex > 0 ? 'page-break' : ''}`}>
+            <div className="day-header">
+              <div className="day-info">
+                <h3>Day {day.dayNumber}</h3>
+                <div className="day-details">
+                  <span>{format(parseISO(day.date), 'EEEE, MMMM d, yyyy')}</span>
+                  <span>•</span>
+                  <span>{getCityName(day.city)}</span>
+                </div>
+              </div>
+              <div className="day-cost">
+                <span className="cost-label">Day Cost</span>
+                <span className="cost-value">${day.dailyCostUSD}</span>
+              </div>
+            </div>
+
+            <div className="activities">
               {day.activities.length === 0 ? (
-                <p className="text-gray-500 italic">No activities planned</p>
+                <div className="no-activities">
+                  <p>No activities planned for this day</p>
+                </div>
               ) : (
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-gray-600">
-                      <th className="pb-2 font-medium">Activity</th>
-                      <th className="pb-2 font-medium">Time</th>
-                      <th className="pb-2 font-medium">Duration</th>
-                      <th className="pb-2 font-medium text-right">Cost</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {day.activities.map((activity, index) => (
-                      <tr key={activity.id} className="border-t border-gray-100">
-                        <td className="py-2">
-                          <span className="font-medium">{activity.name}</span>
-                          <br />
-                          <span className="text-gray-500 text-xs">{activity.description}</span>
-                        </td>
-                        <td className="py-2 capitalize">{activity.timeOfDay}</td>
-                        <td className="py-2">{activity.durationHours}h</td>
-                        <td className="py-2 text-right">${activity.estimatedCostUSD}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div className="activity-list">
+                  {day.activities.map((activity, index) => (
+                    <div key={activity.id} className="activity-item">
+                      <div className="activity-time">
+                        <Clock className="w-4 h-4" />
+                        <span className="time-slot">{activity.timeOfDay}</span>
+                        <span className="duration">{activity.durationHours}h</span>
+                      </div>
+                      <div className="activity-content">
+                        <h4 className="activity-name">{activity.name}</h4>
+                        <p className="activity-description">{activity.description}</p>
+                      </div>
+                      <div className="activity-cost">
+                        <span>${activity.estimatedCostUSD}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Budget Summary */}
-      <div className="mt-8 pt-6 border-t-2 border-gray-200">
-        <h2 className="text-xl font-semibold mb-4">Budget Summary</h2>
-        <table className="w-full text-sm">
-          <tbody>
-            {days.map((day) => (
-              <tr key={day.dayNumber} className="border-b border-gray-100">
-                <td className="py-2">Day {day.dayNumber} - {getCityName(day.city)}</td>
-                <td className="py-2 text-right">${day.dailyCostUSD}</td>
-              </tr>
-            ))}
-            <tr className="font-semibold text-lg">
-              <td className="pt-4">Total Estimated Cost</td>
-              <td className="pt-4 text-right">${totalCostUSD.toLocaleString()}</td>
-            </tr>
-            <tr className="text-gray-600">
-              <td className="py-2">Total Budget</td>
-              <td className="py-2 text-right">${onboardingData.budgetUSD.toLocaleString()}</td>
-            </tr>
-            <tr className={totalCostUSD <= onboardingData.budgetUSD ? 'text-green-600' : 'text-red-600'}>
-              <td className="py-2 font-medium">Remaining</td>
-              <td className="py-2 text-right font-medium">
-                ${(onboardingData.budgetUSD - totalCostUSD).toLocaleString()}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      </section>
 
       {/* Footer */}
-      <div className="mt-8 pt-6 border-t border-gray-200 text-center text-sm text-gray-500">
-        <p>Generated by UAE Tour Planner • {format(new Date(), 'MMMM d, yyyy')}</p>
-      </div>
+      <footer className="print-footer">
+        <div className="footer-content">
+          <div className="brand-info">
+            <span className="brand-name">UAE Tour Planner</span>
+            <span className="separator">•</span>
+            <span className="date">{format(new Date(), 'MMMM d, yyyy')}</span>
+          </div>
+          <div className="tagline">Your Perfect UAE Adventure Awaits</div>
+        </div>
+      </footer>
 
-      {/* Back button - hidden in print */}
-      <div className="mt-8 text-center no-print">
-        <button
-          onClick={() => navigate('/itinerary')}
-          className="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
-        >
+      {/* Non-print controls */}
+      <div className="no-print-controls">
+        {isPro ? (
+          <button onClick={() => window.print()} className="print-btn">
+            Print Document
+          </button>
+        ) : (
+          <div className="upgrade-prompt">
+            <Crown className="w-5 h-5" />
+            <span>Upgrade to Pro to print your itinerary</span>
+            <button onClick={() => navigate('/pricing')} className="upgrade-btn">
+              Upgrade Now
+            </button>
+          </div>
+        )}
+        <button onClick={() => navigate('/itinerary')} className="back-btn">
           Back to Itinerary
         </button>
       </div>
