@@ -1,1 +1,10 @@
 project_id = "magwwbsarvbmnztgypao"
+
+[functions.ai-chat]
+verify_jwt = false
+
+[functions.ai-itinerary]
+verify_jwt = false
+
+[functions.ai-suggest]
+verify_jwt = false
