@@ -1,32 +1,10 @@
 // Activity Agent - Manages activity recommendations and bookings
 import { TravelIntent } from '../ai-gateway';
 import { longCatClient } from '../longcat-client';
+import { Activity } from '../../../types';
 
-export interface Activity {
-  id: string;
-  name: string;
-  category: 'Outdoor' | 'Indoor' | 'Beach' | 'Cultural' | 'Adventure' | 'Shopping' | 'Dining';
-  description: string;
-  duration: number; // in hours
-  price: {
-    adult: number;
-    child: number;
-    currency: string;
-  };
-  location: {
-    city: string;
-    area: string;
-    coordinates?: { lat: number; lng: number };
-  };
-  rating: number;
-  reviews: number;
-  images: string[];
-  suitableFor: string[]; // ['families', 'couples', 'solo', 'kids']
-  bestTime: string;
-  weatherDependent: boolean;
-  bookingRequired: boolean;
-  tips: string[];
-}
+// Re-export Activity for backward compatibility
+export type { Activity };
 
 export class ActivityAgent {
   private activities: Activity[] = [];

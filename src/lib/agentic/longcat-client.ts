@@ -1,6 +1,20 @@
 // LongCat API Client - OpenAI Compatible Format
 // Integration with LongCat API Platform for AI features
 
+import { TravelIntent } from './ai-gateway';
+import { Activity } from './agents/activity-agent';
+import { WeatherData } from './agents/weather-agent';
+
+export interface WeatherImpactAnalysis {
+  activityId: string;
+  activityName: string;
+  suitability: 'Good' | 'Fair' | 'Poor';
+  recommendations: string[];
+  bestTiming: string;
+  safetyConsiderations: string[];
+  indoorAlternatives?: string;
+}
+
 export interface LongCatMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
@@ -43,6 +57,24 @@ export class LongCatClient {
 
   constructor() {
     this.apiKey = import.meta.env.VITE_LONGCAT_API_KEY || null;
+    
+    // Validate API key if provided (will be validated at usage time for graceful degradation)
+    if (this.apiKey && this.apiKey.length < 10) {
+      console.warn('VITE_LONGCAT_API_KEY appears to be invalid (too short)');
+    }
+  }
+
+  private validateApiKey(): void {
+    if (!this.apiKey) {
+      throw new Error(
+        'LongCat API key not configured. Please set VITE_LONGCAT_API_KEY environment variable. ' +
+        'Refer to .env.example for the required format.'
+      );
+    }
+    
+    if (this.apiKey.length < 10) {
+      throw new Error('VITE_LONGCAT_API_KEY appears to be invalid (too short)');
+    }
   }
 
   private async checkRateLimit(): Promise<void> {
@@ -122,9 +154,7 @@ export class LongCatClient {
       stream?: boolean;
     } = {}
   ): Promise<LongCatResponse> {
-    if (!this.apiKey) {
-      throw new Error('LongCat API key not configured. Please set VITE_LONGCAT_API_KEY environment variable.');
-    }
+    this.validateApiKey();
 
     return this.retryWithBackoff(async () => {
       await this.checkRateLimit();
@@ -163,7 +193,7 @@ export class LongCatClient {
     });
   }
 
-  async extractTravelIntent(userInput: string): Promise<any> {
+  async extractTravelIntent(userInput: string): Promise<TravelIntent> {
     const systemPrompt = `You are a UAE travel expert AI assistant. Extract travel intent from user messages in Urdu/English.
 
 Rules:
@@ -216,7 +246,7 @@ Return only valid JSON:`;
     }
   }
 
-  async generateItinerarySuggestion(intent: any): Promise<string> {
+  async generateItinerarySuggestion(intent: TravelIntent): Promise<string> {
     const systemPrompt = `You are an expert UAE travel planner. Create personalized itinerary suggestions.
 
 Guidelines:
@@ -293,7 +323,7 @@ Provide a helpful, accurate answer with practical tips:`;
   async generateActivityRecommendations(
     city: string, 
     interests: string[], 
-    weather: any,
+    weather: WeatherData | null,
     budget: number
   ): Promise<string> {
     const systemPrompt = `You are a UAE activity expert. Recommend activities based on user preferences.
@@ -335,7 +365,7 @@ Provide 3-5 specific recommendations with:
     }
   }
 
-  async analyzeWeatherImpact(activities: any[], weather: any[]): Promise<any[]> {
+  async analyzeWeatherImpact(activities: Activity[], weather: WeatherData[]): Promise<WeatherImpactAnalysis[]> {
     const systemPrompt = `You are a weather and travel expert. Analyze how weather conditions affect outdoor activities in UAE.
 
 Consider:
@@ -427,7 +457,12 @@ Return as structured JSON:`;
   getUsageStats(): {
     provider: string;
     model: string;
-    rateLimit: any;
+    rateLimit: {
+      requestsInWindow: number;
+      maxRequests: number;
+      resetTime: number;
+      timeUntilReset: number;
+    };
     configured: boolean;
   } {
     return {

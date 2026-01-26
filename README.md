@@ -1,73 +1,183 @@
-# Welcome to your Lovable project
+# Dubai Dream Planner
 
-## Project info
+An AI-powered travel planning application for Dubai and the UAE. Create personalized itineraries, get activity recommendations, and optimize your travel budget with intelligent AI agents.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Features
 
-## How can I edit this code?
+- **AI-Powered Planning**: Intelligent itinerary generation using advanced AI agents
+- **Multi-Language Support**: Plan your trip in your preferred language
+- **Weather-Aware Recommendations**: Get activity suggestions based on weather conditions
+- **Budget Optimization**: Smart budget analysis and cost optimization
+- **Personalized Activities**: Curated activity recommendations based on your interests
+- **Interactive Itinerary**: Visual timeline of your daily activities
 
-There are several ways of editing your application.
+## Architecture
 
-**Use Lovable**
+The application uses an agentic AI architecture with specialized agents:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- **Planning Agent**: Generates and optimizes travel itineraries
+- **Activity Agent**: Manages activity recommendations and bookings
+- **Weather Agent**: Handles weather information and recommendations
+- **Budget Agent**: Analyzes and optimizes travel budgets
+- **Orchestrator**: Coordinates all agents and manages conversation flow
 
-Changes made via Lovable will be committed automatically to this repo.
+### Tech Stack
 
-**Use your preferred IDE**
+- **Frontend**: React 18, TypeScript, Vite
+- **Styling**: Tailwind CSS, shadcn/ui
+- **State Management**: React Hooks, Local Storage
+- **AI Integration**: LongCat AI Gateway, Custom AI Client
+- **Testing**: Vitest, React Testing Library
+- **Documentation**: TypeDoc
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Getting Started
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Prerequisites
 
-Follow these steps:
+- Node.js 18+ 
+- npm or pnpm
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Installation
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```bash
+# Install dependencies
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The application will be available at `http://localhost:5173`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Environment Variables
 
-**Use GitHub Codespaces**
+Create a `.env` file based on `.env.example`:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```env
+VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+VITE_OPENWEATHER_API_KEY=your-openweather-api-key
+VITE_LONGCAT_API_KEY=your-longcat-api-key
+```
 
-## What technologies are used for this project?
+## Project Structure
 
-This project is built with:
+```
+src/
+├── components/          # React components
+│   ├── agentic/        # AI-related components
+│   ├── onboarding/     # Onboarding wizard components
+│   └── ui/             # shadcn/ui components
+├── lib/
+│   ├── agentic/        # AI agents and orchestration
+│   │   ├── agents/     # Specialized agents
+│   │   ├── ai-gateway.ts
+│   │   ├── longcat-client.ts
+│   │   └── orchestrator.ts
+│   ├── ai-client.ts
+│   ├── error-handling.ts
+│   └── storage.ts
+├── pages/              # Route pages
+├── types/              # TypeScript type definitions
+└── test/               # Unit and component tests
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Key Features
 
-## How can I deploy this project?
+### AI Planning
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+The AI planning system uses multiple specialized agents to create optimal travel experiences:
 
-## Can I connect a custom domain to my Lovable project?
+```typescript
+import { orchestrator } from './lib/agentic/orchestrator';
 
-Yes, you can!
+const itinerary = await orchestrator.createItinerary({
+  city: 'dubai',
+  dates: { start: '2024-03-01', end: '2024-03-07' },
+  travelers: { adults: 2, children: 0 },
+  budget: { amount: 5000, currency: 'AED' },
+  interests: ['culture', 'adventure']
+});
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Multi-Language Support
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+The application supports multiple languages for travel planning:
+
+```typescript
+import { languageDetector } from './lib/agentic/language-detector';
+
+const detectedLang = await languageDetector.detect('أريد زيارة دبي');
+// Returns: 'ar'
+```
+
+## Testing
+
+```bash
+# Run all tests
+npm test
+
+# Run with coverage
+npm test -- --coverage
+
+# Run specific test file
+npm test -- weather-agent.test.ts
+```
+
+## Building for Production
+
+```bash
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Connect your repository to Vercel
+2. Configure environment variables
+3. Deploy
+
+```bash
+# Deploy using Vercel CLI
+npx vercel deploy --prod
+```
+
+### Docker
+
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "3000"]
+```
+
+## Documentation
+
+Generate API documentation:
+
+```bash
+npm run docs
+```
+
+Documentation will be available in the `docs/` directory.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+## License
+
+MIT License - see LICENSE file for details

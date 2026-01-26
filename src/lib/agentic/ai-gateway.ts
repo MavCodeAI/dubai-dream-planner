@@ -44,8 +44,26 @@ export class AIGateway {
     // In production, these should come from environment variables
     this.lovableApiKey = import.meta.env.VITE_LOVABLE_API_KEY || null;
     
+    // Validate Lovable API key format if provided
+    if (this.lovableApiKey && this.lovableApiKey.length < 10) {
+      console.warn('VITE_LOVABLE_API_KEY appears to be invalid (too short)');
+    }
+    
     // Check which provider is available and set preference
     this.initializeProvider();
+  }
+
+  private validateLovableApiKey(): void {
+    if (!this.lovableApiKey) {
+      throw new Error(
+        'Lovable API key not configured. Please set VITE_LOVABLE_API_KEY environment variable. ' +
+        'Refer to .env.example for the required format.'
+      );
+    }
+    
+    if (this.lovableApiKey.length < 10) {
+      throw new Error('VITE_LOVABLE_API_KEY appears to be invalid (too short)');
+    }
   }
 
   private async initializeProvider(): Promise<void> {
@@ -111,9 +129,7 @@ export class AIGateway {
   }
 
   private async callLovable(prompt: string, systemPrompt?: string): Promise<AIResponse> {
-    if (!this.lovableApiKey) {
-      throw new Error('Lovable API key not configured');
-    }
+    this.validateLovableApiKey();
 
     const response = await fetch(`${this.lovableBaseUrl}/chat/completions`, {
       method: 'POST',

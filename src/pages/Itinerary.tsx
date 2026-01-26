@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentTrip, saveCurrentTrip, saveTrip, canSaveMoreTrips, canExportPDF, isProUser, upgradeToPro } from '@/lib/storage';
 import { regenerateDay } from '@/lib/itinerary-generator';
@@ -98,8 +98,19 @@ export default function Itinerary() {
   if (!trip) return null;
 
   const { onboardingData, days, totalCostUSD } = trip;
-  const budgetProgress = (totalCostUSD / onboardingData.budgetUSD) * 100;
-  const budgetStatus = budgetProgress < 70 ? 'good' : budgetProgress < 90 ? 'warning' : 'danger';
+  // Memoized function to get available activities for a day
+  const getAvailableActivitiesForDay = useCallback((dayNumber: number) => {
+    const day = trip.days[dayNumber - 1];
+    const usedIds = new Set(day.activities.map((a) => a.id));
+    return MOCK_ACTIVITIES.filter((a) => a.city === day.city && !usedIds.has(a.id));
+  }, [trip]);
+
+  // Memoized budget progress calculation
+  const { budgetProgress, budgetStatus } = useMemo(() => {
+    const progress = (totalCostUSD / onboardingData.budgetUSD) * 100;
+    const status = progress < 70 ? 'good' : progress < 90 ? 'warning' : 'danger';
+    return { budgetProgress: progress, budgetStatus: status };
+  }, [totalCostUSD, onboardingData.budgetUSD]);
 
   const handleSaveName = () => {
     if (tripName.trim()) {
@@ -135,13 +146,13 @@ export default function Itinerary() {
       });
   };
 
-  const handleToggleDay = (dayNumber: number) => {
+  const handleToggleDay = useCallback((dayNumber: number) => {
     setOpenDays((prev) =>
       prev.includes(dayNumber)
         ? prev.filter((d) => d !== dayNumber)
         : [...prev, dayNumber]
     );
-  };
+  }, []);
 
   const handleSaveTrip = () => {
     if (!canSaveMoreTrips()) {
@@ -183,9 +194,9 @@ export default function Itinerary() {
     setShowShareModal(true);
   };
 
-  const getCityName = (cityId: string) => {
+  const getCityName = useCallback((cityId: string) => {
     return EMIRATES.find((e) => e.id === cityId)?.name || cityId;
-  };
+  }, []);
 
   const handleAddActivity = (activity: Activity) => {
     if (!addActivityDay) return;
@@ -483,7 +494,7 @@ export default function Itinerary() {
             <div>
               <h4 className="font-medium mb-3">Available Activities</h4>
               <div className="space-y-2 max-h-48 overflow-y-auto">
-                {addActivityDay && availableActivitiesForDay(addActivityDay).map((activity) => (
+                {addActivityDay && getAvailableActivitiesForDay(addActivityDay).map((activity) => (
                   <button
                     key={activity.id}
                     onClick={() => handleAddActivity(activity)}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentTrip } from '@/lib/storage';
 import { Trip, EMIRATES } from '@/types';
@@ -31,18 +31,21 @@ export default function MapPage() {
     return <EmptyMapState />;
   }
 
-  const getCityName = (cityId: string) => {
+  const getCityName = useCallback((cityId: string) => {
     return EMIRATES.find((e) => e.id === cityId)?.name || cityId;
-  };
+  }, []);
 
-  // Collect all stops in order
-  const allStops = trip.days.flatMap((day) =>
-    day.activities.map((activity) => ({
-      ...activity,
-      dayNumber: day.dayNumber,
-      date: day.date,
-      city: getCityName(day.city),
-    }))
+  // Memoized computation of all stops
+  const allStops = useMemo(() => 
+    trip.days.flatMap((day) =>
+      day.activities.map((activity) => ({
+        ...activity,
+        dayNumber: day.dayNumber,
+        date: day.date,
+        city: getCityName(day.city),
+      }))
+    ),
+    [trip, getCityName]
   );
 
   const openInGoogleMaps = () => {

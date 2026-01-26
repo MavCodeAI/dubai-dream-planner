@@ -1,17 +1,17 @@
 // Agentic Orchestrator - Manages the AI workflow and coordinates different agents
 import { aiGateway, TravelIntent } from './ai-gateway';
-import { WeatherAgent } from './agents/weather-agent';
-import { ActivityAgent } from './agents/activity-agent';
-import { BudgetAgent } from './agents/budget-agent';
-import { PlanningAgent } from './agents/planning-agent';
+import { WeatherAgent, WeatherData } from './agents/weather-agent';
+import { ActivityAgent, Activity } from './agents/activity-agent';
+import { BudgetAgent, BudgetAnalysis } from './agents/budget-agent';
+import { PlanningAgent, Itinerary } from './agents/planning-agent';
 
 export interface AgenticState {
   userMessage: string;
   intent?: TravelIntent;
-  weather?: any;
-  activities?: any[];
-  budgetAnalysis?: any;
-  itinerary?: any;
+  weather?: WeatherData[];
+  activities?: Activity[];
+  budgetAnalysis?: BudgetAnalysis;
+  itinerary?: Itinerary;
   suggestions?: string[];
   errors: string[];
   isProcessing: boolean;
@@ -55,7 +55,7 @@ export class AgenticOrchestrator {
       
     } catch (error) {
       console.error('Agentic orchestrator error:', error);
-      state.errors.push(`Processing error: ${error.message}`);
+      state.errors.push(`Processing error: ${error instanceof Error ? error.message : 'Unknown error'}`);
       state.isProcessing = false;
     }
 
@@ -100,7 +100,7 @@ export class AgenticOrchestrator {
       throw new Error('No intent available for research');
     }
 
-    const tasks = [];
+    const tasks: Promise<void>[] = [];
 
     // Get weather information
     if (state.intent.city && state.intent.dates) {
@@ -171,6 +171,10 @@ export class AgenticOrchestrator {
   private async finalizePlan(state: AgenticState): Promise<void> {
     if (!state.itinerary) {
       throw new Error('No itinerary available for finalization');
+    }
+    
+    if (!state.intent) {
+      throw new Error('No intent available for finalization');
     }
 
     try {

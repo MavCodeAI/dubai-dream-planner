@@ -1,4 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import ItineraryCard from '@/components/agentic/ItineraryCard';
+import SuggestionCard from '@/components/agentic/SuggestionCard';
+import ErrorCard from '@/components/agentic/ErrorCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,14 +14,9 @@ import {
   User, 
   Sparkles, 
   MapPin, 
-  Calendar, 
-  DollarSign,
-  Users,
+  Calendar,
   Clock,
-  CheckCircle,
-  AlertCircle,
-  Lightbulb,
-  Plane
+  CheckCircle
 } from 'lucide-react';
 import { agenticOrchestrator, AgenticState } from '@/lib/agentic/orchestrator';
 import { TravelIntent } from '@/lib/agentic/ai-gateway';
@@ -26,13 +24,55 @@ import { languageDetector } from '@/lib/agentic/language-detector';
 import { useNavigate } from 'react-router-dom';
 import { useAnalytics } from '@/lib/analytics';
 
+interface MessageMetadata {
+  languageContext?: {
+    detectedLanguage: string;
+    responseLanguage: string;
+  };
+}
+
+interface ItineraryMetadata {
+  id: string;
+  title: string;
+  city: string;
+  startDate: string;
+  endDate: string;
+  days: Array<{
+    dayNumber: number;
+    date: string;
+    activities: Array<{
+      activity: {
+        id: string;
+        name: string;
+        description: string;
+        category: string;
+        duration: number;
+        price: { adult: number; child: number; currency: string };
+        location: { city: string; area: string };
+        rating: number;
+      };
+      startTime: string;
+      endTime: string;
+      estimatedCost: number;
+    }>;
+    totalCost: number;
+    totalDuration: number;
+  }>;
+  totalCost: number;
+  summary: {
+    activities: number;
+    freeActivities: number;
+    paidActivities: number;
+  };
+}
+
 interface Message {
   id: string;
   content: string;
   sender: 'user' | 'agent';
   timestamp: Date;
   type?: 'text' | 'itinerary' | 'suggestion' | 'error';
-  metadata?: any;
+  metadata?: MessageMetadata | ItineraryMetadata;
 }
 
 const AgenticChat: React.FC = () => {
@@ -196,14 +236,20 @@ const AgenticChat: React.FC = () => {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
-  };
+  }, [handleSendMessage]);
 
-  const renderMessage = (message: Message) => {
+  const handleViewFullItinerary = useCallback((itinerary: ItineraryMetadata) => {
+    localStorage.setItem('currentItinerary', JSON.stringify(itinerary));
+    navigate('/itinerary');
+    analytics.trackFeature('agentic_itinerary_view', 'complete');
+  }, [navigate, analytics]);
+
+  const renderMessage = useCallback((message: Message) => {
     const isUser = message.sender === 'user';
     
     return (
@@ -221,7 +267,10 @@ const AgenticChat: React.FC = () => {
           <Card className={`flex-1 ${isUser ? 'bg-primary text-primary-foreground' : 'bg-card'}`}>
             <CardContent className="p-3">
               {message.type === 'itinerary' && message.metadata ? (
-                <ItineraryCard itinerary={message.metadata} />
+                <ItineraryCard 
+                  itinerary={message.metadata as ItineraryMetadata} 
+                  onViewFullItinerary={() => handleViewFullItinerary(message.metadata as ItineraryMetadata)}
+                />
               ) : message.type === 'suggestion' ? (
                 <SuggestionCard content={message.content} />
               ) : message.type === 'error' ? (
@@ -244,71 +293,7 @@ const AgenticChat: React.FC = () => {
         </div>
       </div>
     );
-  };
-
-  const ItineraryCard: React.FC<{ itinerary: any }> = ({ itinerary }) => (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2 mb-3">
-        <Plane className="w-5 h-5 text-green-600" />
-        <h3 className="font-semibold">{itinerary.title}</h3>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-2 text-sm">
-        <div className="flex items-center gap-2">
-          <MapPin className="w-4 h-4" />
-          <span>{itinerary.city}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Calendar className="w-4 h-4" />
-          <span>{itinerary.days.length} days</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <DollarSign className="w-4 h-4" />
-          <span>AED {itinerary.totalCost}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Users className="w-4 h-4" />
-          <span>{itinerary.summary.activities} activities</span>
-        </div>
-      </div>
-      
-      <div className="flex gap-2 mt-3">
-        <Button 
-          size="sm" 
-          onClick={() => {
-            localStorage.setItem('currentItinerary', JSON.stringify(itinerary));
-            navigate('/itinerary');
-            analytics.trackFeature('agentic_itinerary_view', 'complete');
-          }}
-        >
-          View Full Itinerary
-        </Button>
-        <Button size="sm" variant="outline">
-          Edit Plan
-        </Button>
-      </div>
-    </div>
-  );
-
-  const SuggestionCard: React.FC<{ content: string }> = ({ content }) => (
-    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-      <div className="flex items-center gap-2 mb-2">
-        <Lightbulb className="w-4 h-4 text-blue-600" />
-        <span className="font-medium text-blue-900">Suggestions</span>
-      </div>
-      <div className="text-sm text-blue-800 whitespace-pre-wrap">{content}</div>
-    </div>
-  );
-
-  const ErrorCard: React.FC<{ content: string }> = ({ content }) => (
-    <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-      <div className="flex items-center gap-2 mb-2">
-        <AlertCircle className="w-4 h-4 text-red-600" />
-        <span className="font-medium text-red-900">Error</span>
-      </div>
-      <div className="text-sm text-red-800 whitespace-pre-wrap">{content}</div>
-    </div>
-  );
+  }, [handleViewFullItinerary]);
 
   return (
     <div className="flex flex-col h-screen bg-background">

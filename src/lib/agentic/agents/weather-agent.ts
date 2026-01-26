@@ -1,6 +1,17 @@
 // Weather Agent - Handles weather information and recommendations
 import { longCatClient } from '../longcat-client';
-export interface WeatherData {
+import { Activity } from './activity-agent';
+
+// Re-export WeatherImpactAnalysis from longcat-client
+export type WeatherImpactAnalysis = {
+  activityId: string;
+  activityName: string;
+  suitability: 'Good' | 'Fair' | 'Poor';
+  recommendations: string[];
+  bestTiming: string;
+  safetyConsiderations: string[];
+  indoorAlternatives?: string;
+};export interface WeatherData {
   date: string;
   temperature: {
     min: number;
@@ -127,10 +138,21 @@ export class WeatherAgent {
     return bestTimes;
   }
 
-  async analyzeWeatherImpact(activities: any[], weather: WeatherData[]): Promise<any[]> {
+  async analyzeWeatherImpact(activities: Activity[], weather: WeatherData[]): Promise<WeatherImpactAnalysis[]> {
     // Use LongCat AI for enhanced weather impact analysis
     try {
-      return await longCatClient.analyzeWeatherImpact(activities, weather);
+      const results = await longCatClient.analyzeWeatherImpact(activities, weather);
+      
+      // Map to WeatherImpactAnalysis format
+      return results.map(result => ({
+        activityId: '',
+        activityName: result.activityName,
+        suitability: result.suitability,
+        recommendations: result.recommendations,
+        bestTiming: result.bestTiming,
+        safetyConsiderations: result.safetyConsiderations,
+        indoorAlternatives: result.indoorAlternatives
+      }));
     } catch (error) {
       console.error('Failed to analyze weather impact with AI, using fallback:', error);
       
@@ -138,20 +160,22 @@ export class WeatherAgent {
       return activities.map(activity => {
         const impact = this.calculateWeatherImpact(activity, weather);
         return {
-          ...activity,
-          weatherSuitability: impact.suitability,
-          weatherNotes: impact.notes,
-          recommendedTime: impact.recommendedTime
+          activityId: activity.id,
+          activityName: activity.name,
+          suitability: impact.suitability,
+          recommendations: impact.notes,
+          bestTiming: impact.recommendedTime,
+          safetyConsiderations: []
         };
       });
     }
   }
 
-  private calculateWeatherImpact(activity: any, weather: WeatherData[]): any {
+  private calculateWeatherImpact(activity: Activity, weather: WeatherData[]): { suitability: 'Good' | 'Fair' | 'Poor'; notes: string[]; recommendedTime: string } {
     // Simple weather impact calculation
     const avgTemp = weather.reduce((sum, day) => sum + day.temperature.average, 0) / weather.length;
     
-    let suitability = 'Good';
+    let suitability: 'Good' | 'Fair' | 'Poor' = 'Good';
     let notes: string[] = [];
     let recommendedTime = 'Any time';
 

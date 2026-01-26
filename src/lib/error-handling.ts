@@ -1,4 +1,28 @@
 import { toast } from 'sonner';
+import { Trip } from '@/types';
+
+export interface TripData {
+  onboardingData: {
+    startDate: string;
+    endDate: string;
+    adults: number;
+    children: number;
+    cities: string[];
+    budgetUSD: number;
+    interests: string[];
+  };
+  days: Array<{
+    dayNumber: number;
+    activities: Array<{
+      id: string;
+      name: string;
+      estimatedCostUSD: number;
+    }>;
+  }>;
+  totalCostUSD: number;
+  name: string;
+  updatedAt: string;
+}
 
 export class AppError extends Error {
   constructor(
@@ -68,7 +92,7 @@ export function safeLocalStorageOperation<T>(
   }
 }
 
-export function validateTripData(data: any): boolean {
+export function validateTripData(data: TripData): boolean {
   try {
     if (!data || typeof data !== 'object') {
       throw new ValidationError('Invalid trip data format');

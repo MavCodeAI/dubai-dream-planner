@@ -10,17 +10,48 @@ export interface OnboardingData {
   pace: 'relaxed' | 'standard' | 'packed';
 }
 
+/**
+ * Detailed Activity interface for travel planning
+ */
 export interface Activity {
+  /** Unique identifier for the activity */
   id: string;
+  /** Name of the activity */
   name: string;
-  city: string;
+  /** Category of the activity */
+  category: 'Outdoor' | 'Indoor' | 'Beach' | 'Cultural' | 'Adventure' | 'Shopping' | 'Dining';
+  /** Detailed description of the activity */
   description: string;
-  durationHours: number;
-  estimatedCostUSD: number;
-  tags: string[];
-  timeOfDay: 'morning' | 'afternoon' | 'evening' | 'anytime';
-  familyFriendly: boolean;
-  luxuryLevel: 'budget' | 'mid' | 'lux';
+  /** Duration of the activity in hours */
+  duration: number;
+  /** Pricing information */
+  price: {
+    adult: number;
+    child: number;
+    currency: string;
+  };
+  /** Location details */
+  location: {
+    city: string;
+    area: string;
+    coordinates?: { lat: number; lng: number };
+  };
+  /** Activity rating (0-5) */
+  rating: number;
+  /** Number of reviews */
+  reviews: number;
+  /** Array of image URLs */
+  images: string[];
+  /** Target audiences */
+  suitableFor: string[];
+  /** Best time to visit */
+  bestTime: string;
+  /** Whether activity is weather-dependent */
+  weatherDependent: boolean;
+  /** Whether booking is required */
+  bookingRequired: boolean;
+  /** Tips for the activity */
+  tips: string[];
 }
 
 export interface DayPlan {
