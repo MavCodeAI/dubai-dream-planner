@@ -48,6 +48,10 @@ export function BudgetStep({
             USD
           </span>
         </div>
+        
+        <p className="text-center text-sm text-muted-foreground">
+          This helps us stay within your comfort range
+        </p>
 
         {/* Slider */}
         <div className="space-y-4">

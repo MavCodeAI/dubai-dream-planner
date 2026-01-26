@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { 
   Compass, 
   MapPin, 
@@ -11,6 +12,7 @@ import {
   Building2,
   Mountain
 } from 'lucide-react';
+import { isFirstVisit } from '@/lib/storage';
 
 const features = [
   {
@@ -43,6 +45,7 @@ const stats = [
 
 export default function Index() {
   const navigate = useNavigate();
+  const showFirstTimeBanner = isFirstVisit();
 
   return (
     <div className="min-h-screen">
@@ -121,6 +124,33 @@ export default function Index() {
         </div>
       </section>
 
+      {/* First-time user banner */}
+      {showFirstTimeBanner && (
+        <section className="py-12 px-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+          <div className="container max-w-4xl mx-auto text-center">
+            <Badge className="mb-4 bg-blue-100 text-blue-800 hover:bg-blue-100">
+              <Sparkles className="w-3 h-3 mr-1" />
+              New Here?
+            </Badge>
+            <h2 className="text-2xl font-bold text-navy mb-4">
+              Plan your UAE trip in 2 minutes. No signup required.
+            </h2>
+            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
+              Get a personalized itinerary tailored to your interests, budget, and travel style. 
+              Everything stays on your device - no accounts needed.
+            </p>
+            <Button
+              onClick={() => navigate('/onboarding')}
+              className="btn-gradient gap-2"
+              size="lg"
+            >
+              Start Planning Now
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </section>
+      )}
+
       {/* Features Section */}
       <section className="py-20 px-4 bg-background">
         <div className="container max-w-6xl mx-auto">
@@ -172,13 +202,6 @@ export default function Index() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="py-8 px-4 border-t border-border">
-        <div className="container max-w-6xl mx-auto text-center text-muted-foreground text-sm">
-          <p>© 2024 UAE Tour Planner. All rights reserved.</p>
-        </div>
-      </footer>
     </div>
   );
 }

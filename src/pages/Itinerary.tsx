@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCurrentTrip, saveCurrentTrip, saveTrip } from '@/lib/storage';
+import { getCurrentTrip, saveCurrentTrip, saveTrip, canSaveMoreTrips, canExportPDF, upgradeToPro } from '@/lib/storage';
 import { regenerateDay } from '@/lib/itinerary-generator';
 import { Trip, Activity, DayPlan, EMIRATES } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { PricingModal } from '@/components/PricingModal';
 import {
   Calendar,
   Users,
@@ -45,6 +46,7 @@ import {
   Download,
   Pencil,
   Save,
+  Share2,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -57,6 +59,8 @@ export default function Itinerary() {
   const [editingName, setEditingName] = useState(false);
   const [tripName, setTripName] = useState('');
   const [openDays, setOpenDays] = useState<number[]>([1]);
+  const [showPricingModal, setShowPricingModal] = useState(false);
+  const [pricingFeature, setPricingFeature] = useState('');
   
   // Activity dialogs
   const [addActivityDay, setAddActivityDay] = useState<number | null>(null);
@@ -114,12 +118,33 @@ export default function Itinerary() {
   };
 
   const handleSaveTrip = () => {
+    if (!canSaveMoreTrips()) {
+      setPricingFeature('save unlimited trips');
+      setShowPricingModal(true);
+      return;
+    }
     saveTrip(trip);
-    toast.success('Trip saved to your collection!');
+    toast.success('Trip saved to this device.');
   };
 
   const handleExportPDF = () => {
+    if (!canExportPDF()) {
+      setPricingFeature('export PDF');
+      setShowPricingModal(true);
+      return;
+    }
     navigate('/print');
+  };
+
+  const handleUpgrade = () => {
+    upgradeToPro();
+    toast.success('Welcome to Pro! Enjoy unlimited features.');
+  };
+
+  const handleShareTrip = () => {
+    const shareText = `I planned my UAE trip using this tool. Try it here: ${window.location.origin}`;
+    navigator.clipboard.writeText(shareText);
+    toast.success('Trip link copied to clipboard!');
   };
 
   const getCityName = (cityId: string) => {
@@ -258,6 +283,13 @@ export default function Itinerary() {
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="container max-w-4xl mx-auto">
+        {/* Confirmation message */}
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 text-center">
+          <p className="text-green-800 font-medium">
+            Your trip plan is ready. You can edit, save, or export it.
+          </p>
+        </div>
+
         {/* Header */}
         <div className="bg-card rounded-2xl border border-border p-6 mb-6 shadow-lg">
           {/* Trip name */}
@@ -345,11 +377,18 @@ export default function Itinerary() {
               <Download className="w-4 h-4" />
               Export PDF
             </Button>
+            <Button variant="outline" onClick={handleShareTrip} className="gap-2">
+              <Share2 className="w-4 h-4" />
+              Share Trip
+            </Button>
           </div>
         </div>
 
         {/* Day cards */}
         <div className="space-y-4">
+          <div className="text-center text-sm text-muted-foreground mb-4">
+            You can edit anything — this is just a starting plan
+          </div>
           {days.map((day) => (
             <DayCard
               key={day.dayNumber}
@@ -523,6 +562,14 @@ export default function Itinerary() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Pricing Modal */}
+      <PricingModal
+        isOpen={showPricingModal}
+        onClose={() => setShowPricingModal(false)}
+        onUpgrade={handleUpgrade}
+        feature={pricingFeature}
+      />
     </div>
   );
 }

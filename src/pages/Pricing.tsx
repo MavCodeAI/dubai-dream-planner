@@ -10,50 +10,28 @@ const plans = [
     description: 'Perfect for trying out the planner',
     features: [
       { name: '1 saved trip', included: true },
-      { name: 'Up to 7 days itinerary', included: true },
-      { name: 'Basic activities', included: true },
-      { name: 'PDF export', included: true },
+      { name: 'View itinerary', included: true },
+      { name: 'Basic planning features', included: true },
       { name: 'Unlimited trips', included: false },
-      { name: 'Premium activities', included: false },
-      { name: 'Priority support', included: false },
-      { name: 'Custom branding', included: false },
+      { name: 'Export PDF', included: false },
+      { name: 'Edit activities freely', included: false },
     ],
     cta: 'Current Plan',
     popular: false,
   },
   {
     name: 'Pro',
-    price: 29,
+    price: 9,
     description: 'For serious travelers',
     features: [
-      { name: 'Unlimited saved trips', included: true },
-      { name: 'Up to 30 days itinerary', included: true },
-      { name: 'All activities', included: true },
-      { name: 'PDF export', included: true },
+      { name: 'Unlimited trips', included: true },
+      { name: 'Export PDF', included: true },
+      { name: 'Edit activities freely', included: true },
       { name: 'Priority support', included: true },
-      { name: 'Offline access', included: true },
-      { name: 'Custom branding', included: false },
-      { name: 'Team collaboration', included: false },
+      { name: 'All premium features', included: true },
     ],
     cta: 'Upgrade to Pro',
     popular: true,
-  },
-  {
-    name: 'Business',
-    price: 99,
-    description: 'For travel agencies',
-    features: [
-      { name: 'Everything in Pro', included: true },
-      { name: 'Unlimited team members', included: true },
-      { name: 'Custom branding', included: true },
-      { name: 'White-label export', included: true },
-      { name: 'API access', included: true },
-      { name: 'Analytics dashboard', included: true },
-      { name: 'Dedicated support', included: true },
-      { name: 'SLA guarantee', included: true },
-    ],
-    cta: 'Contact Sales',
-    popular: false,
   },
 ];
 
@@ -102,7 +80,7 @@ export default function Pricing() {
                 <h3 className="text-xl font-semibold text-navy mb-2">{plan.name}</h3>
                 <div className="flex items-baseline justify-center gap-1">
                   <span className="text-4xl font-bold text-navy">${plan.price}</span>
-                  {plan.price > 0 && <span className="text-muted-foreground">/month</span>}
+                  {plan.price > 0 && <span className="text-muted-foreground">/one-time</span>}
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">{plan.description}</p>
               </div>
@@ -145,6 +123,43 @@ export default function Pricing() {
               </Button>
             </div>
           ))}
+        </div>
+
+        {/* Trust Section */}
+        <div className="mt-16 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8">
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-navy mb-4">Why Travelers Trust Us</h3>
+            <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
+                  <Check className="w-6 h-6 text-green-600" />
+                </div>
+                <h4 className="font-semibold mb-2">Built for UAE travelers</h4>
+                <p className="text-sm text-muted-foreground">Designed specifically for exploring the United Arab Emirates</p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+                  <Check className="w-6 h-6 text-blue-600" />
+                </div>
+                <h4 className="font-semibold mb-2">No signup required</h4>
+                <p className="text-sm text-muted-foreground">Start planning immediately without creating an account</p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
+                  <Check className="w-6 h-6 text-purple-600" />
+                </div>
+                <h4 className="font-semibold mb-2">Your data stays on your device</h4>
+                <p className="text-sm text-muted-foreground">Complete privacy - nothing is stored on our servers</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Social Proof */}
+          <div className="text-center border-t pt-8">
+            <p className="text-sm text-muted-foreground italic">
+              "Used by travelers planning family and couple trips to UAE"
+            </p>
+          </div>
         </div>
 
         {/* FAQ */}

@@ -6,6 +6,8 @@ const defaultStorageData: StorageData = {
   onboardingData: null,
   currentTrip: null,
   savedTrips: [],
+  isFirstVisit: true,
+  isProUser: false,
 };
 
 export function getStorageData(): StorageData {
@@ -18,6 +20,8 @@ export function getStorageData(): StorageData {
       onboardingData: parsed.onboardingData || null,
       currentTrip: parsed.currentTrip || null,
       savedTrips: parsed.savedTrips || [],
+      isFirstVisit: parsed.isFirstVisit ?? true,
+      isProUser: parsed.isProUser ?? false,
     };
   } catch (error) {
     console.error('Error reading from localStorage:', error);
@@ -84,4 +88,29 @@ export function clearAllData(): void {
 
 export function generateId(): string {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
+
+export function isFirstVisit(): boolean {
+  return getStorageData().isFirstVisit;
+}
+
+export function markFirstVisitComplete(): void {
+  saveStorageData({ isFirstVisit: false });
+}
+
+export function isProUser(): boolean {
+  return getStorageData().isProUser;
+}
+
+export function upgradeToPro(): void {
+  saveStorageData({ isProUser: true });
+}
+
+export function canSaveMoreTrips(): boolean {
+  const { savedTrips, isProUser } = getStorageData();
+  return isProUser || savedTrips.length < 1;
+}
+
+export function canExportPDF(): boolean {
+  return getStorageData().isProUser;
 }

@@ -45,6 +45,8 @@ export interface StorageData {
   onboardingData: OnboardingData | null;
   currentTrip: Trip | null;
   savedTrips: Trip[];
+  isFirstVisit: boolean;
+  isProUser: boolean;
 }
 
 export const EMIRATES = [
