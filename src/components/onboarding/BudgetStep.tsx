@@ -1,7 +1,8 @@
 import { StepContainer } from './StepIndicator';
 import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
-import { DollarSign, Wallet, Calculator } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { DollarSign, Wallet, Calculator, Minus, Plus } from 'lucide-react';
 import { differenceInDays, parseISO } from 'date-fns';
 
 interface BudgetStepProps {
@@ -31,22 +32,44 @@ export function BudgetStep({
       subtitle="Set your total trip budget in USD"
     >
       <div className="max-w-lg mx-auto space-y-8">
-        {/* Budget input */}
-        <div className="relative">
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full gradient-bg flex items-center justify-center">
-            <DollarSign className="w-5 h-5 text-primary-foreground" />
+        {/* Budget input with plus/minus buttons */}
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-14 w-14 rounded-xl shrink-0"
+            onClick={() => onBudgetChange(Math.max(100, budgetUSD - 100))}
+            disabled={budgetUSD <= 100}
+          >
+            <Minus className="w-5 h-5" />
+          </Button>
+          
+          <div className="relative flex-1">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full gradient-bg flex items-center justify-center">
+              <DollarSign className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <Input
+              type="number"
+              value={budgetUSD}
+              onChange={(e) => onBudgetChange(Math.max(100, Math.min(50000, Number(e.target.value))))}
+              className="pl-20 h-14 text-2xl font-bold rounded-xl border-2 focus:border-primary"
+              min={100}
+              max={50000}
+            />
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
+              USD
+            </span>
           </div>
-          <Input
-            type="number"
-            value={budgetUSD}
-            onChange={(e) => onBudgetChange(Math.max(100, Number(e.target.value)))}
-            className="pl-20 h-16 text-2xl font-bold rounded-xl border-2 focus:border-primary"
-            min={100}
-            max={100000}
-          />
-          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
-            USD
-          </span>
+          
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-14 w-14 rounded-xl shrink-0"
+            onClick={() => onBudgetChange(Math.min(50000, budgetUSD + 100))}
+            disabled={budgetUSD >= 50000}
+          >
+            <Plus className="w-5 h-5" />
+          </Button>
         </div>
         
         <p className="text-center text-sm text-muted-foreground">
