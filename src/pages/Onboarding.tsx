@@ -38,6 +38,32 @@ export default function Onboarding() {
     setData((prev) => ({ ...prev, [key]: value }));
   };
 
+  const handleTripTypeChange = (tripType: 'solo' | 'couple' | 'family' | 'group') => {
+    let adults = 1;
+    let children = 0;
+    
+    switch (tripType) {
+      case 'solo':
+        adults = 1;
+        children = 0;
+        break;
+      case 'couple':
+        adults = 2;
+        children = 0;
+        break;
+      case 'family':
+        adults = 2;
+        children = 1;
+        break;
+      case 'group':
+        adults = 4;
+        children = 0;
+        break;
+    }
+    
+    setData((prev) => ({ ...prev, tripType, adults, children }));
+  };
+
   const toggleCity = (cityId: string) => {
     setData((prev) => ({
       ...prev,
@@ -149,14 +175,14 @@ export default function Onboarding() {
                 />
               )}
               {step === 3 && (
-                <TravelersStep
-                  adults={data.adults}
-                  children={data.children}
-                  tripType={data.tripType}
-                  onAdultsChange={(v) => updateData('adults', v)}
-                  onChildrenChange={(v) => updateData('children', v)}
-                  onTripTypeChange={(v) => updateData('tripType', v)}
-                />
+              <TravelersStep
+                adults={data.adults}
+                children={data.children}
+                tripType={data.tripType}
+                onAdultsChange={(v) => updateData('adults', v)}
+                onChildrenChange={(v) => updateData('children', v)}
+                onTripTypeChange={handleTripTypeChange}
+              />
               )}
               {step === 4 && (
                 <BudgetStep
