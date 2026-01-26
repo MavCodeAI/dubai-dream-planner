@@ -124,7 +124,7 @@ export async function exportToPDF(trip: Trip): Promise<void> {
     });
 
     // Footer on each page
-    const totalPages = pdf.internal.getNumberOfPages();
+    const totalPages = pdf.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
       pdf.setPage(i);
       pdf.setFontSize(8);

@@ -56,6 +56,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { MOCK_ACTIVITIES } from '@/data/activities';
 import { exportToPDF } from '@/lib/pdf-export';
+import AISuggestCard from '@/components/AISuggestCard';
 
 export default function Itinerary() {
   const navigate = useNavigate();
@@ -450,12 +451,21 @@ export default function Itinerary() {
               isRegenerating={regeneratingDay === day.dayNumber}
               onToggle={() => handleToggleDay(day.dayNumber)}
               onRegenerate={() => handleRegenerateDay(day.dayNumber)}
-              onAddActivity={() => setAddActivityDay(day.dayNumber)}
+              onAddActivity={(activity) => {
+                if (activity) {
+                  handleAddActivity(activity);
+                } else {
+                  setAddActivityDay(day.dayNumber);
+                }
+              }}
               onEditActivity={(activity) => setEditingActivity({ dayNumber: day.dayNumber, activity })}
               onRemoveActivity={(activityId) => setDeleteConfirm({ dayNumber: day.dayNumber, activityId })}
               onMoveActivity={(activityId, direction) => handleMoveActivity(day.dayNumber, activityId, direction)}
               getCityName={getCityName}
               isPro={isPro}
+              remainingBudget={onboardingData.budgetUSD - totalCostUSD}
+              interests={onboardingData.interests}
+              hasChildren={onboardingData.children > 0}
             />
           ))}
         </div>
@@ -673,12 +683,15 @@ interface DayCardProps {
   isRegenerating: boolean;
   onToggle: () => void;
   onRegenerate: () => void;
-  onAddActivity: () => void;
+  onAddActivity: (activity?: Activity) => void;
   onEditActivity: (activity: Activity) => void;
   onRemoveActivity: (activityId: string) => void;
   onMoveActivity: (activityId: string, direction: 'up' | 'down') => void;
   getCityName: (cityId: string) => string;
   isPro: boolean;
+  remainingBudget: number;
+  interests: string[];
+  hasChildren: boolean;
 }
 
 function DayCard({
@@ -693,6 +706,9 @@ function DayCard({
   onMoveActivity,
   getCityName,
   isPro,
+  remainingBudget,
+  interests,
+  hasChildren,
 }: DayCardProps) {
   const timeSlotColors = {
     morning: 'bg-yellow-100 text-yellow-800',
@@ -742,7 +758,7 @@ function DayCard({
                   </span>
                 )}
               </Button>
-              <Button variant="outline" size="sm" onClick={onAddActivity} className="gap-1 relative">
+              <Button variant="outline" size="sm" onClick={() => onAddActivity()} className="gap-1 relative">
                 <Plus className="w-3 h-3" />
                 Add Activity
                 {!isPro && (
@@ -833,6 +849,19 @@ function DayCard({
                 ))
               )}
             </div>
+
+            {/* AI Suggestions */}
+            {isPro && (
+              <AISuggestCard
+                city={day.city}
+                dayNumber={day.dayNumber}
+                currentActivities={day.activities}
+                remainingBudget={remainingBudget}
+                interests={interests}
+                hasChildren={hasChildren}
+                onAddActivity={(activity) => onAddActivity(activity)}
+              />
+            )}
           </div>
         </CollapsibleContent>
       </div>

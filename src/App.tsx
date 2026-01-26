@@ -17,6 +17,7 @@ import Print from "./pages/Print";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 import AgenticChat from "./components/AgenticChat";
+import AIFloatingButton from "./components/AIFloatingButton";
 import { isFirstVisit, markFirstVisitComplete } from "@/lib/storage";
 
 const queryClient = new QueryClient();
@@ -59,6 +60,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AppWrapper />
+          <AIFloatingButton />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
