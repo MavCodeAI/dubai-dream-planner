@@ -18,48 +18,22 @@ export interface Activity {
   id: string;
   /** Name of the activity */
   name: string;
-  /** Category of the activity */
-  category: 'Outdoor' | 'Indoor' | 'Beach' | 'Cultural' | 'Adventure' | 'Shopping' | 'Dining';
+  /** City where the activity is located */
+  city: string;
   /** Detailed description of the activity */
   description: string;
-  /** Duration of the activity in hours */
-  duration: number;
-  /** Duration in hours (alias for duration) */
-  durationHours?: number;
-  /** Pricing information */
-  price: {
-    adult: number;
-    child: number;
-    currency: string;
-  };
+  /** Duration in hours */
+  durationHours: number;
   /** Estimated cost in USD */
-  estimatedCostUSD?: number;
-  /** Location details */
-  location: {
-    city: string;
-    area: string;
-    coordinates?: { lat: number; lng: number };
-  };
-  /** City (shortcut for location.city) */
-  city?: string;
-  /** Activity rating (0-5) */
-  rating: number;
-  /** Number of reviews */
-  reviews: number;
-  /** Array of image URLs */
-  images: string[];
-  /** Target audiences */
-  suitableFor: string[];
-  /** Best time to visit */
-  bestTime: string;
+  estimatedCostUSD: number;
+  /** Tags for filtering and matching interests */
+  tags: string[];
   /** Time of day for the activity */
-  timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'anytime';
-  /** Whether activity is weather-dependent */
-  weatherDependent: boolean;
-  /** Whether booking is required */
-  bookingRequired: boolean;
-  /** Tips for the activity */
-  tips: string[];
+  timeOfDay: 'morning' | 'afternoon' | 'evening' | 'anytime';
+  /** Whether activity is family-friendly */
+  familyFriendly: boolean;
+  /** Luxury level of the activity */
+  luxuryLevel: 'budget' | 'mid' | 'lux';
 }
 
 export interface DayPlan {

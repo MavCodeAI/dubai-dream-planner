@@ -232,30 +232,14 @@ export default function Itinerary() {
     const newActivity: Activity = {
       id: `custom-${Date.now()}`,
       name: customActivity.name,
-      category: 'Indoor',
+      city: trip.days[addActivityDay - 1].city,
       description: 'Custom activity',
-      duration: customActivity.durationHours,
       durationHours: customActivity.durationHours,
       estimatedCostUSD: customActivity.estimatedCostUSD,
-      price: {
-        adult: customActivity.estimatedCostUSD,
-        child: customActivity.estimatedCostUSD * 0.8,
-        currency: 'USD'
-      },
-      location: {
-        city: trip.days[addActivityDay - 1].city,
-        area: 'Custom Location'
-      },
-      city: trip.days[addActivityDay - 1].city,
-      rating: 0,
-      reviews: 0,
-      images: [],
-      suitableFor: [],
-      bestTime: 'Any time',
+      tags: ['custom'],
       timeOfDay: customActivity.timeOfDay,
-      weatherDependent: false,
-      bookingRequired: false,
-      tips: []
+      familyFriendly: true,
+      luxuryLevel: 'budget',
     };
 
     handleAddActivity(newActivity);
@@ -844,7 +828,7 @@ function DayCard({
                         </span>
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <Clock className="w-3 h-3" />
-                          {activity.durationHours || activity.duration}h
+                          {activity.durationHours}h
                         </span>
                       </div>
                     </div>
