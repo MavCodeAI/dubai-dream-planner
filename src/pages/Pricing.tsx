@@ -2,8 +2,11 @@ import { Button } from '@/components/ui/button';
 import { Check, X, Crown, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useState, useEffect } from 'react';
+import { isProUser, upgradeToPro } from '@/lib/storage';
+import UpgradeModal from '@/components/UpgradeModal';
 
-const plans = [
+const getPlans = (isPro: boolean) => [
   {
     name: 'Free',
     price: 0,
@@ -30,14 +33,30 @@ const plans = [
       { name: 'Priority support', included: true },
       { name: 'All premium features', included: true },
     ],
-    cta: 'Upgrade to Pro',
+    cta: isPro ? 'Current Plan' : 'Upgrade to Pro',
     popular: true,
   },
 ];
 
 export default function Pricing() {
+  const [isPro, setIsPro] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  useEffect(() => {
+    setIsPro(isProUser());
+  }, []);
+
   const handleUpgrade = (planName: string) => {
-    toast.info(`${planName} plan coming soon! This is a demo.`);
+    if (planName === 'Pro') {
+      setShowUpgradeModal(true);
+    } else {
+      toast.info(`${planName} plan coming soon! This is a demo.`);
+    }
+  };
+
+  const handleUpgradeSuccess = () => {
+    setIsPro(true);
+    setShowUpgradeModal(false);
   };
 
   return (
@@ -59,7 +78,7 @@ export default function Pricing() {
 
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-6">
-          {plans.map((plan) => (
+          {getPlans(isPro).map((plan) => (
             <div
               key={plan.name}
               className={cn(
@@ -114,10 +133,10 @@ export default function Pricing() {
                 className={cn(
                   "w-full",
                   plan.popular ? "btn-gradient" : "",
-                  plan.price === 0 ? "cursor-default" : ""
+                  plan.price === 0 || (plan.name === 'Pro' && isPro) ? "cursor-default" : ""
                 )}
                 variant={plan.popular ? "default" : "outline"}
-                disabled={plan.price === 0}
+                disabled={plan.price === 0 || (plan.name === 'Pro' && isPro)}
               >
                 {plan.cta}
               </Button>
@@ -134,22 +153,22 @@ export default function Pricing() {
                 <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
                   <Check className="w-6 h-6 text-green-600" />
                 </div>
-                <h4 className="font-semibold mb-2">Built for UAE travelers</h4>
-                <p className="text-sm text-muted-foreground">Designed specifically for exploring the United Arab Emirates</p>
+                <h4 className="font-semibold mb-2">No signup required</h4>
+                <p className="text-sm text-muted-foreground">Start planning immediately without creating an account</p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
                   <Check className="w-6 h-6 text-blue-600" />
                 </div>
-                <h4 className="font-semibold mb-2">No signup required</h4>
-                <p className="text-sm text-muted-foreground">Start planning immediately without creating an account</p>
+                <h4 className="font-semibold mb-2">Your data stays on your device</h4>
+                <p className="text-sm text-muted-foreground">Complete privacy - nothing is stored on our servers</p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
                   <Check className="w-6 h-6 text-purple-600" />
                 </div>
-                <h4 className="font-semibold mb-2">Your data stays on your device</h4>
-                <p className="text-sm text-muted-foreground">Complete privacy - nothing is stored on our servers</p>
+                <h4 className="font-semibold mb-2">Export a clean PDF itinerary</h4>
+                <p className="text-sm text-muted-foreground">Get a beautiful, printable PDF of your trip plan</p>
               </div>
             </div>
           </div>
@@ -170,6 +189,11 @@ export default function Pricing() {
           </p>
         </div>
       </div>
+
+      <UpgradeModal 
+        isOpen={showUpgradeModal} 
+        onClose={() => setShowUpgradeModal(false)} 
+      />
     </div>
   );
 }

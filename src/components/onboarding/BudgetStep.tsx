@@ -50,7 +50,7 @@ export function BudgetStep({
         </div>
         
         <p className="text-center text-sm text-muted-foreground">
-          This helps us stay within your comfort range
+          We keep activities under your comfort range. You control everything.
         </p>
 
         {/* Slider */}

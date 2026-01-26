@@ -93,6 +93,13 @@ export default function Onboarding() {
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="container max-w-4xl mx-auto">
+        {/* Intro text */}
+        <div className="text-center mb-8">
+          <p className="text-lg text-muted-foreground font-medium">
+            Plan your UAE trip in 2 minutes. No signup required.
+          </p>
+        </div>
+
         {/* Step indicator */}
         <div className="mb-8">
           <StepIndicator

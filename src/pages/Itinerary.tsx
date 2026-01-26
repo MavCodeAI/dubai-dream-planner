@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCurrentTrip, saveCurrentTrip, saveTrip, canSaveMoreTrips, canExportPDF, upgradeToPro } from '@/lib/storage';
+import { getCurrentTrip, saveCurrentTrip, saveTrip, canSaveMoreTrips, canExportPDF, isProUser, upgradeToPro } from '@/lib/storage';
 import { regenerateDay } from '@/lib/itinerary-generator';
 import { Trip, Activity, DayPlan, EMIRATES } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -28,7 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { PricingModal } from '@/components/PricingModal';
+import UpgradeModal from '@/components/UpgradeModal';
 import {
   Calendar,
   Users,
@@ -47,6 +47,7 @@ import {
   Pencil,
   Save,
   Share2,
+  Crown,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -59,8 +60,10 @@ export default function Itinerary() {
   const [editingName, setEditingName] = useState(false);
   const [tripName, setTripName] = useState('');
   const [openDays, setOpenDays] = useState<number[]>([1]);
-  const [showPricingModal, setShowPricingModal] = useState(false);
-  const [pricingFeature, setPricingFeature] = useState('');
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeFeature, setUpgradeFeature] = useState('');
+  const [isPro, setIsPro] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   
   // Activity dialogs
   const [addActivityDay, setAddActivityDay] = useState<number | null>(null);
@@ -84,6 +87,7 @@ export default function Itinerary() {
     setTrip(currentTrip);
     setTripName(currentTrip.name);
     setOpenDays([1]);
+    setIsPro(isProUser());
   }, [navigate]);
 
   if (!trip) return null;
@@ -103,6 +107,13 @@ export default function Itinerary() {
   };
 
   const handleRegenerateDay = (dayNumber: number) => {
+    // Check if user is pro for unlimited regeneration
+    if (!isPro) {
+      setUpgradeFeature('unlimited itinerary regeneration');
+      setShowUpgradeModal(true);
+      return;
+    }
+    
     const updated = regenerateDay(trip, dayNumber);
     setTrip(updated);
     saveCurrentTrip(updated);
@@ -119,8 +130,8 @@ export default function Itinerary() {
 
   const handleSaveTrip = () => {
     if (!canSaveMoreTrips()) {
-      setPricingFeature('save unlimited trips');
-      setShowPricingModal(true);
+      setUpgradeFeature('save unlimited trips');
+      setShowUpgradeModal(true);
       return;
     }
     saveTrip(trip);
@@ -129,8 +140,8 @@ export default function Itinerary() {
 
   const handleExportPDF = () => {
     if (!canExportPDF()) {
-      setPricingFeature('export PDF');
-      setShowPricingModal(true);
+      setUpgradeFeature('export PDF');
+      setShowUpgradeModal(true);
       return;
     }
     navigate('/print');
@@ -138,13 +149,12 @@ export default function Itinerary() {
 
   const handleUpgrade = () => {
     upgradeToPro();
+    setIsPro(true);
     toast.success('Welcome to Pro! Enjoy unlimited features.');
   };
 
   const handleShareTrip = () => {
-    const shareText = `I planned my UAE trip using this tool. Try it here: ${window.location.origin}`;
-    navigator.clipboard.writeText(shareText);
-    toast.success('Trip link copied to clipboard!');
+    setShowShareModal(true);
   };
 
   const getCityName = (cityId: string) => {
@@ -177,6 +187,13 @@ export default function Itinerary() {
 
   const handleAddCustomActivity = () => {
     if (!addActivityDay || !customActivity.name.trim()) return;
+    
+    // Check if user is pro for custom activities
+    if (!isPro) {
+      setUpgradeFeature('add custom activities');
+      setShowUpgradeModal(true);
+      return;
+    }
     
     const newActivity: Activity = {
       id: `custom-${Date.now()}`,
@@ -373,9 +390,14 @@ export default function Itinerary() {
               <Bookmark className="w-4 h-4" />
               Save Trip
             </Button>
-            <Button variant="outline" onClick={handleExportPDF} className="gap-2">
+            <Button variant="outline" onClick={handleExportPDF} className="gap-2 relative">
               <Download className="w-4 h-4" />
               Export PDF
+              {!isPro && (
+                <span className="absolute -top-2 -right-2 bg-yellow-500 text-white text-xs rounded-full p-1">
+                  <Crown className="w-3 h-3" />
+                </span>
+              )}
             </Button>
             <Button variant="outline" onClick={handleShareTrip} className="gap-2">
               <Share2 className="w-4 h-4" />
@@ -387,7 +409,7 @@ export default function Itinerary() {
         {/* Day cards */}
         <div className="space-y-4">
           <div className="text-center text-sm text-muted-foreground mb-4">
-            You can edit anything — this is just a starting plan
+            This is a starting plan. You can edit anything.
           </div>
           {days.map((day) => (
             <DayCard
@@ -401,6 +423,7 @@ export default function Itinerary() {
               onRemoveActivity={(activityId) => setDeleteConfirm({ dayNumber: day.dayNumber, activityId })}
               onMoveActivity={(activityId, direction) => handleMoveActivity(day.dayNumber, activityId, direction)}
               getCityName={getCityName}
+              isPro={isPro}
             />
           ))}
         </div>
@@ -563,12 +586,47 @@ export default function Itinerary() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Pricing Modal */}
-      <PricingModal
-        isOpen={showPricingModal}
-        onClose={() => setShowPricingModal(false)}
-        onUpgrade={handleUpgrade}
-        feature={pricingFeature}
+      {/* Share Modal */}
+      <Dialog open={showShareModal} onOpenChange={setShowShareModal}>
+        <DialogContent className="bg-card">
+          <DialogHeader>
+            <DialogTitle>Share Your UAE Trip</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-muted-foreground">
+              Share your amazing UAE trip plan with friends and family!
+            </p>
+            <div className="p-4 bg-muted/50 rounded-lg">
+              <p className="text-sm font-medium mb-2">Share message:</p>
+              <p className="text-sm text-muted-foreground">
+                I planned my UAE trip using this tool. Try it here: {window.location.origin || 'https://uaetourplanner.com'}
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button 
+                onClick={() => {
+                  const shareText = `I planned my UAE trip using this tool. Try it here: ${window.location.origin || 'https://uaetourplanner.com'}`;
+                  navigator.clipboard.writeText(shareText);
+                  toast.success('Trip link copied to clipboard!');
+                  setShowShareModal(false);
+                }}
+                className="flex-1"
+              >
+                Copy to Clipboard
+              </Button>
+              <Button variant="outline" onClick={() => setShowShareModal(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        feature={upgradeFeature}
       />
     </div>
   );
@@ -585,6 +643,7 @@ interface DayCardProps {
   onRemoveActivity: (activityId: string) => void;
   onMoveActivity: (activityId: string, direction: 'up' | 'down') => void;
   getCityName: (cityId: string) => string;
+  isPro: boolean;
 }
 
 function DayCard({
@@ -597,6 +656,7 @@ function DayCard({
   onRemoveActivity,
   onMoveActivity,
   getCityName,
+  isPro,
 }: DayCardProps) {
   const timeSlotColors = {
     morning: 'bg-yellow-100 text-yellow-800',
@@ -637,13 +697,23 @@ function DayCard({
           <div className="px-5 pb-5 border-t border-border">
             {/* Actions */}
             <div className="flex gap-2 py-4">
-              <Button variant="outline" size="sm" onClick={onRegenerate} className="gap-1">
+              <Button variant="outline" size="sm" onClick={onRegenerate} className="gap-1 relative">
                 <RefreshCcw className="w-3 h-3" />
                 Regenerate
+                {!isPro && (
+                  <span className="absolute -top-2 -right-2 bg-yellow-500 text-white text-xs rounded-full p-1">
+                    <Crown className="w-3 h-3" />
+                  </span>
+                )}
               </Button>
-              <Button variant="outline" size="sm" onClick={onAddActivity} className="gap-1">
+              <Button variant="outline" size="sm" onClick={onAddActivity} className="gap-1 relative">
                 <Plus className="w-3 h-3" />
                 Add Activity
+                {!isPro && (
+                  <span className="absolute -top-2 -right-2 bg-yellow-500 text-white text-xs rounded-full p-1">
+                    <Crown className="w-3 h-3" />
+                  </span>
+                )}
               </Button>
             </div>
 
