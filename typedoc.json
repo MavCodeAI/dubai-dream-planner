@@ -1,0 +1,75 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "Dubai Dream Planner",
+  "version": "1.0.0",
+  "description": "AI-powered travel planning application for Dubai and the UAE",
+  "readme": "./README.md",
+  "out": "docs",
+  "entryPoints": [
+    "src/lib/agentic/orchestrator.ts",
+    "src/lib/agentic/longcat-client.ts",
+    "src/lib/agentic/ai-gateway.ts",
+    "src/lib/ai-client.ts",
+    "src/lib/storage.ts",
+    "src/lib/error-handling.ts",
+    "src/types/index.ts",
+    "src/lib/agentic/agents/weather-agent.ts",
+    "src/lib/agentic/agents/activity-agent.ts",
+    "src/lib/agentic/agents/budget-agent.ts",
+    "src/lib/agentic/agents/planning-agent.ts"
+  ],
+  "exclude": [
+    "**/node_modules/**",
+    "**/test/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/src/vite-env.d.ts",
+    "**/src/main.tsx",
+    "**/src/App.tsx",
+    "**/src/components/ui/**"
+  ],
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeExternals": true,
+  "includeVersion": true,
+  "categorizeByGroup": true,
+  "defaultCategory": "Other",
+  "categoryOrder": [
+    "Agentic AI",
+    "AI Client",
+    "Storage",
+    "Error Handling",
+    "Types",
+    "Other"
+  ],
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true
+  },
+  "search": {
+    "enableIndex": true
+  },
+  "comment": {
+    "enableInheritedClassMember": {
+      "since": "0.0.1"
+    }
+  },
+  "typescript": {
+    "entryPointStrategy": "expand"
+  },
+  "treatImportAsExternal": true,
+  "validation": {
+    "notExported": true,
+    "invalidTypeLinks": true,
+    "deprecated": true,
+    "asynchronousSignatures": true
+  },
+  "markdown": {
+    "descriptionText": "Use GitHub-flavored Markdown for documentation comments",
+    "headers": {
+      "categoryDescription": "### Category Description"
+    }
+  }
+}

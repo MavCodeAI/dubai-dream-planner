@@ -1,3 +1,18 @@
+/**
+ * Error handling utilities for the application
+ * Provides error classes, validation, and recovery mechanisms
+ * 
+ * @example
+ * ```typescript
+ * import { AppError, handleAsyncError, safeLocalStorageOperation } from './lib/error-handling';
+ * 
+ * try {
+ *   // Some operation
+ * } catch (error) {
+ *   throw new AppError('Failed to save trip', 'SAVE_ERROR');
+ * }
+ * ```
+ */
 import { toast } from 'sonner';
 import { Trip } from '@/types';
 
@@ -24,6 +39,15 @@ export interface TripData {
   updatedAt: string;
 }
 
+/**
+ * Base error class for application errors
+ * Provides structured error information with recovery hints
+ * 
+ * @example
+ * ```typescript
+ * throw new AppError('Failed to save data', 'SAVE_ERROR', true);
+ * ```
+ */
 export class AppError extends Error {
   constructor(
     message: string,
@@ -35,18 +59,27 @@ export class AppError extends Error {
   }
 }
 
+/**
+ * Error class for storage-related failures
+ */
 export class StorageError extends AppError {
   constructor(message: string, recoverable: boolean = true) {
     super(message, 'STORAGE_ERROR', recoverable);
   }
 }
 
+/**
+ * Error class for network-related failures
+ */
 export class NetworkError extends AppError {
   constructor(message: string) {
     super(message, 'NETWORK_ERROR', true);
   }
 }
 
+/**
+ * Error class for validation failures
+ */
 export class ValidationError extends AppError {
   constructor(message: string) {
     super(message, 'VALIDATION_ERROR', true);

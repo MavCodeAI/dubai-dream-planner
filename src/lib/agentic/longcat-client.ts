@@ -45,6 +45,20 @@ export interface LongCatError {
   };
 }
 
+/**
+ * LongCat API Client - OpenAI Compatible Format
+ * Integration with LongCat API Platform for AI features
+ * 
+ * @example
+ * ```typescript
+ * import { longCatClient } from './lib/agentic/longcat-client';
+ * 
+ * const response = await longCatClient.chatCompletion([
+ *   { role: 'system', content: 'You are a travel expert' },
+ *   { role: 'user', content: 'Best time to visit Dubai?' }
+ * ], { temperature: 0.7 });
+ * ```
+ */
 export class LongCatClient {
   private baseUrl = 'https://api.longcat.chat/openai';
   private apiKey: string | null = null;
@@ -145,6 +159,21 @@ export class LongCatClient {
     throw new Error('Max retries exceeded');
   }
 
+  /**
+   * Send a chat completion request to the LongCat API
+   * 
+   * @param messages - Array of messages with role and content
+   * @param options - Optional settings for model, temperature, max_tokens
+   * @returns Promise resolving to the chat completion response
+   * @throws Error if API key is not configured or request fails
+   * @example
+   * ```typescript
+   * const response = await longCatClient.chatCompletion([
+   *   { role: 'system', content: 'You are a UAE travel expert' },
+   *   { role: 'user', content: 'Suggest activities in Dubai' }
+   * ], { temperature: 0.7, max_tokens: 500 });
+   * ```
+   */
   async chatCompletion(
     messages: LongCatMessage[],
     options: {
@@ -193,6 +222,21 @@ export class LongCatClient {
     });
   }
 
+  /**
+   * Extract travel intent from user input
+   * Uses AI to parse natural language and extract structured travel information
+   * 
+   * @param userInput - The user's message in English or Urdu
+   * @returns Promise resolving to extracted TravelIntent object
+   * @throws Error if extraction fails
+   * @example
+   * ```typescript
+   * const intent = await longCatClient.extractTravelIntent(
+   *   'میں دبئی جانا چاہتا ہوں اگلے ہفتے، 2 بالغ، $3000 بجٹ'
+   * );
+   * // Returns: { city: 'dubai', dates: {...}, travelers: {...}, budget: {...} }
+   * ```
+   */
   async extractTravelIntent(userInput: string): Promise<TravelIntent> {
     const systemPrompt = `You are a UAE travel expert AI assistant. Extract travel intent from user messages in Urdu/English.
 
@@ -246,6 +290,22 @@ Return only valid JSON:`;
     }
   }
 
+  /**
+   * Generate personalized itinerary suggestions
+   * 
+   * @param intent - TravelIntent with trip details
+   * @returns Promise resolving to itinerary suggestion text
+   * @throws Error if generation fails
+   * @example
+   * ```typescript
+   * const suggestion = await longCatClient.generateItinerarySuggestion({
+   *   city: 'dubai',
+   *   dates: { start: '2024-03-01', end: '2024-03-07' },
+   *   travelers: { adults: 2, children: 1 },
+   *   budget: { amount: 5000, currency: 'AED' }
+   * });
+   * ```
+   */
   async generateItinerarySuggestion(intent: TravelIntent): Promise<string> {
     const systemPrompt = `You are an expert UAE travel planner. Create personalized itinerary suggestions.
 
@@ -288,6 +348,20 @@ Provide 3-4 specific suggestions with brief descriptions and practical tips:`;
     }
   }
 
+  /**
+   * Answer travel-related questions
+   * 
+   * @param question - The travel question to answer
+   * @param context - Optional context for the question
+   * @returns Promise resolving to the answer text
+   * @example
+   * ```typescript
+   * const answer = await longCatClient.answerTravelQuestion(
+   *   'What should I wear in Dubai?',
+   *   'Traveling in December'
+   * );
+   * ```
+   */
   async answerTravelQuestion(question: string, context?: string): Promise<string> {
     const systemPrompt = `You are a knowledgeable UAE travel guide. Provide accurate, helpful information about UAE travel.
 
@@ -406,6 +480,18 @@ Return as structured JSON:`;
   }
 
   // Health check method
+  /**
+   * Check if the LongCat API is available
+   * 
+   * @returns Promise resolving to true if API is healthy, false otherwise
+   * @example
+   * ```typescript
+   * const isHealthy = await longCatClient.healthCheck();
+   * if (isHealthy) {
+   *   // Use LongCat API
+   * }
+   * ```
+   */
   async healthCheck(): Promise<boolean> {
     try {
       await this.chatCompletion([

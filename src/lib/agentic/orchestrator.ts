@@ -18,12 +18,31 @@ export interface AgenticState {
   currentStep: 'understanding' | 'researching' | 'planning' | 'finalizing' | 'complete';
 }
 
+/**
+ * Agentic Orchestrator - Manages the AI workflow and coordinates different agents
+ * This is the main entry point for the agentic AI system
+ */
 export class AgenticOrchestrator {
   private weatherAgent = new WeatherAgent();
   private activityAgent = new ActivityAgent();
   private budgetAgent = new BudgetAgent();
   private planningAgent = new PlanningAgent();
 
+  /**
+   * Process a user message and generate a response
+   * This is the main method for interacting with the agentic AI system
+   * 
+   * @param message - The user's input message
+   * @param currentState - Optional current state to continue from
+   * @returns Promise resolving to the updated agentic state
+   * @example
+   * ```typescript
+   * const state = await orchestrator.processUserMessage(
+   *   'I want to visit Dubai next week with my family'
+   * );
+   * console.log(state.itinerary);
+   * ```
+   */
   async processUserMessage(message: string, currentState: Partial<AgenticState> = {}): Promise<AgenticState> {
     const state: AgenticState = {
       userMessage: message,
@@ -197,6 +216,19 @@ export class AgenticOrchestrator {
     }
   }
 
+  /**
+   * Generate clarifying questions for incomplete travel intent
+   * 
+   * @param intent - Partial travel intent to check for missing information
+   * @returns Array of clarifying questions in Urdu/English
+   * @example
+   * ```typescript
+   * const questions = await orchestrator.getClarifyingQuestions({
+   *   city: 'dubai'
+   * });
+   * // Returns: ['کب سفر کرنا ہے؟', 'کتنے افراد سفر کر رہے ہیں؟', ...]
+   * ```
+   */
   async getClarifyingQuestions(intent: Partial<TravelIntent>): Promise<string[]> {
     const questions: string[] = [];
 
@@ -223,6 +255,20 @@ export class AgenticOrchestrator {
     return questions;
   }
 
+  /**
+   * Handle follow-up messages and update the plan accordingly
+   * 
+   * @param message - The follow-up message from the user
+   * @param state - Current agentic state
+   * @returns Updated agentic state after processing follow-up
+   * @example
+   * ```typescript
+   * const updatedState = await orchestrator.handleFollowUp(
+   *   'Actually, I want to add 2 more days',
+   *   currentState
+   * );
+   * ```
+   */
   async handleFollowUp(message: string, state: AgenticState): Promise<AgenticState> {
     // Update intent based on follow-up
     try {

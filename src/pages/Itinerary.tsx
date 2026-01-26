@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCurrentTrip, saveCurrentTrip, saveTrip, canSaveMoreTrips, canExportPDF, isProUser, upgradeToPro } from '@/lib/storage';
+import { getCurrentTrip, saveCurrentTrip, saveTrip, canSaveMoreTrips, isProUser } from '@/lib/storage';
 import { regenerateDay } from '@/lib/itinerary-generator';
 import { Trip, Activity, DayPlan, EMIRATES } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -182,14 +182,6 @@ export default function Itinerary() {
     }
   };
 
-  const handleUpgrade = () => {
-    upgradeToPro();
-    setIsPro(true);
-    toast.success('Welcome to Pro! 🎉', {
-      description: 'Enjoy unlimited features and premium benefits'
-    });
-  };
-
   const handleShareTrip = () => {
     setShowShareModal(true);
   };
@@ -206,7 +198,7 @@ export default function Itinerary() {
     updatedDays[dayIndex] = {
       ...updatedDays[dayIndex],
       activities: [...updatedDays[dayIndex].activities, activity],
-      dailyCostUSD: updatedDays[dayIndex].dailyCostUSD + activity.estimatedCostUSD,
+      dailyCostUSD: updatedDays[dayIndex].dailyCostUSD + (activity.estimatedCostUSD || 0),
     };
 
     const updated: Trip = {
@@ -237,14 +229,30 @@ export default function Itinerary() {
     const newActivity: Activity = {
       id: `custom-${Date.now()}`,
       name: customActivity.name,
-      city: trip.days[addActivityDay - 1].city,
+      category: 'Indoor',
       description: 'Custom activity',
+      duration: customActivity.durationHours,
       durationHours: customActivity.durationHours,
       estimatedCostUSD: customActivity.estimatedCostUSD,
-      tags: [],
+      price: {
+        adult: customActivity.estimatedCostUSD,
+        child: customActivity.estimatedCostUSD * 0.8,
+        currency: 'USD'
+      },
+      location: {
+        city: trip.days[addActivityDay - 1].city,
+        area: 'Custom Location'
+      },
+      city: trip.days[addActivityDay - 1].city,
+      rating: 0,
+      reviews: 0,
+      images: [],
+      suitableFor: [],
+      bestTime: 'Any time',
       timeOfDay: customActivity.timeOfDay,
-      familyFriendly: true,
-      luxuryLevel: 'mid',
+      weatherDependent: false,
+      bookingRequired: false,
+      tips: []
     };
 
     handleAddActivity(newActivity);
@@ -262,7 +270,7 @@ export default function Itinerary() {
     if (activityIndex >= 0) {
       updatedDays[dayIndex].activities[activityIndex] = activity;
       updatedDays[dayIndex].dailyCostUSD = updatedDays[dayIndex].activities.reduce(
-        (sum, a) => sum + a.estimatedCostUSD,
+        (sum, a) => sum + (a.estimatedCostUSD || 0),
         0
       );
     }
@@ -819,21 +827,21 @@ function DayCard({
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-2">
                         <h4 className="font-medium text-foreground">{activity.name}</h4>
-                        <span className="text-primary font-semibold">${activity.estimatedCostUSD}</span>
+                        <span className="text-primary font-semibold">${activity.estimatedCostUSD || 0}</span>
                       </div>
                       <p className="text-sm text-muted-foreground mb-2">{activity.description}</p>
                       <div className="flex items-center gap-3">
                         <span
                           className={cn(
                             "text-xs px-2 py-1 rounded-full font-medium",
-                            timeSlotColors[activity.timeOfDay]
+                            activity.timeOfDay ? timeSlotColors[activity.timeOfDay] : timeSlotColors.anytime
                           )}
                         >
-                          {activity.timeOfDay}
+                          {activity.timeOfDay || 'anytime'}
                         </span>
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <Clock className="w-3 h-3" />
-                          {activity.durationHours}h
+                          {activity.durationHours || activity.duration}h
                         </span>
                       </div>
                     </div>

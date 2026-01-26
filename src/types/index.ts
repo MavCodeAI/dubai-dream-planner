@@ -24,18 +24,24 @@ export interface Activity {
   description: string;
   /** Duration of the activity in hours */
   duration: number;
+  /** Duration in hours (alias for duration) */
+  durationHours?: number;
   /** Pricing information */
   price: {
     adult: number;
     child: number;
     currency: string;
   };
+  /** Estimated cost in USD */
+  estimatedCostUSD?: number;
   /** Location details */
   location: {
     city: string;
     area: string;
     coordinates?: { lat: number; lng: number };
   };
+  /** City (shortcut for location.city) */
+  city?: string;
   /** Activity rating (0-5) */
   rating: number;
   /** Number of reviews */
@@ -46,6 +52,8 @@ export interface Activity {
   suitableFor: string[];
   /** Best time to visit */
   bestTime: string;
+  /** Time of day for the activity */
+  timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'anytime';
   /** Whether activity is weather-dependent */
   weatherDependent: boolean;
   /** Whether booking is required */

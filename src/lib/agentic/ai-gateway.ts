@@ -34,6 +34,19 @@ export interface TravelIntent {
   urgency?: 'immediate' | 'soon' | 'planning';
 }
 
+/**
+ * AI Gateway Integration for Agentic AI
+ * Handles LLM calls through multiple providers with fallback support
+ * 
+ * @example
+ * ```typescript
+ * import { aiGateway } from './lib/agentic/ai-gateway';
+ * 
+ * const intent = await aiGateway.extractTravelIntent(
+ *   'I want to visit Dubai next week'
+ * );
+ * ```
+ */
 export class AIGateway {
   private lovableBaseUrl = 'https://api.lovable.ai/v1';
   private lovableApiKey: string | null = null;
@@ -81,6 +94,23 @@ export class AIGateway {
     }
   }
 
+  /**
+   * Send a message to the LLM and get a response
+   * Uses preferred provider with automatic fallback
+   * 
+   * @param prompt - The user prompt
+   * @param systemPrompt - Optional system prompt for context
+   * @returns Promise resolving to AI response with content and usage info
+   * @throws Error if all providers fail
+   * @example
+   * ```typescript
+   * const response = await aiGateway.callLLM(
+   *   'What are the best activities in Dubai?',
+   *   'You are a UAE travel expert.'
+   * );
+   * console.log(response.content);
+   * ```
+   */
   async callLLM(prompt: string, systemPrompt?: string): Promise<AIResponse> {
     // Try preferred provider first, then fallback if enabled
     try {
@@ -160,6 +190,19 @@ export class AIGateway {
     };
   }
 
+  /**
+   * Extract travel intent from user input
+   * Detects language and uses appropriate prompts
+   * 
+   * @param userInput - The user's message in any language
+   * @returns Promise resolving to extracted TravelIntent
+   * @example
+   * ```typescript
+   * const intent = await aiGateway.extractTravelIntent(
+   *   'دبئی اگلے ہفتے جانا چاہتا ہوں'
+   * );
+   * ```
+   */
   async extractTravelIntent(userInput: string): Promise<TravelIntent> {
     // Detect language first
     const languageContext = languageDetector.detectLanguage(userInput);
@@ -212,6 +255,21 @@ Return only valid JSON:`;
     }
   }
 
+  /**
+   * Generate itinerary suggestion based on travel intent
+   * 
+   * @param intent - The travel intent with trip details
+   * @param userLanguage - Optional language hint for response
+   * @returns Promise resolving to itinerary suggestion text
+   * @example
+   * ```typescript
+   * const suggestion = await aiGateway.generateItinerarySuggestion({
+   *   city: 'dubai',
+   *   dates: { start: '2024-03-01', end: '2024-03-07' },
+   *   travelers: { adults: 2, children: 0 }
+   * });
+   * ```
+   */
   async generateItinerarySuggestion(intent: TravelIntent, userLanguage?: string): Promise<string> {
     // Detect language from user input if provided
     const languageContext = userLanguage ? languageDetector.detectLanguage(userLanguage) : 
@@ -260,6 +318,19 @@ Provide 3-4 specific suggestions with brief descriptions:`;
     }
   }
 
+  /**
+   * Answer travel-related questions
+   * 
+   * @param question - The question to answer
+   * @param context - Optional context for the question
+   * @returns Promise resolving to the answer in user's language
+   * @example
+   * ```typescript
+   * const answer = await aiGateway.answerTravelQuestion(
+   *   'Do I need a visa for Dubai?'
+   * );
+   * ```
+   */
   async answerTravelQuestion(question: string, context?: string): Promise<string> {
     // Detect language from the question
     const languageContext = languageDetector.detectLanguage(question);
