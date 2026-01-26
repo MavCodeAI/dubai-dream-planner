@@ -95,11 +95,9 @@ export default function Itinerary() {
     setIsPro(isProUser());
   }, [navigate]);
 
-  if (!trip) return null;
-
-  const { onboardingData, days, totalCostUSD } = trip;
   // Memoized function to get available activities for a day
   const getAvailableActivitiesForDay = useCallback((dayNumber: number) => {
+    if (!trip) return [];
     const day = trip.days[dayNumber - 1];
     const usedIds = new Set(day.activities.map((a) => a.id));
     return MOCK_ACTIVITIES.filter((a) => a.city === day.city && !usedIds.has(a.id));
@@ -107,10 +105,27 @@ export default function Itinerary() {
 
   // Memoized budget progress calculation
   const { budgetProgress, budgetStatus } = useMemo(() => {
-    const progress = (totalCostUSD / onboardingData.budgetUSD) * 100;
+    if (!trip) return { budgetProgress: 0, budgetStatus: 'good' };
+    const progress = (trip.totalCostUSD / trip.onboardingData.budgetUSD) * 100;
     const status = progress < 70 ? 'good' : progress < 90 ? 'warning' : 'danger';
     return { budgetProgress: progress, budgetStatus: status };
-  }, [totalCostUSD, onboardingData.budgetUSD]);
+  }, [trip]);
+
+  const getCityName = useCallback((cityId: string) => {
+    return EMIRATES.find((e) => e.id === cityId)?.name || cityId;
+  }, []);
+
+  const handleToggleDay = useCallback((dayNumber: number) => {
+    setOpenDays((prev) =>
+      prev.includes(dayNumber)
+        ? prev.filter((d) => d !== dayNumber)
+        : [...prev, dayNumber]
+    );
+  }, []);
+
+  if (!trip) return null;
+
+  const { onboardingData, days, totalCostUSD } = trip;
 
   const handleSaveName = () => {
     if (tripName.trim()) {
@@ -146,14 +161,6 @@ export default function Itinerary() {
       });
   };
 
-  const handleToggleDay = useCallback((dayNumber: number) => {
-    setOpenDays((prev) =>
-      prev.includes(dayNumber)
-        ? prev.filter((d) => d !== dayNumber)
-        : [...prev, dayNumber]
-    );
-  }, []);
-
   const handleSaveTrip = () => {
     if (!canSaveMoreTrips()) {
       setUpgradeFeature('save unlimited trips');
@@ -185,10 +192,6 @@ export default function Itinerary() {
   const handleShareTrip = () => {
     setShowShareModal(true);
   };
-
-  const getCityName = useCallback((cityId: string) => {
-    return EMIRATES.find((e) => e.id === cityId)?.name || cityId;
-  }, []);
 
   const handleAddActivity = (activity: Activity) => {
     if (!addActivityDay) return;
