@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { PageTransition } from "@/components/PageTransition";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { useEffect, useState } from "react";
 import Index from "./pages/Index";
 import Onboarding from "./pages/Onboarding";
@@ -13,6 +14,7 @@ import MapPage from "./pages/Map";
 import Trips from "./pages/Trips";
 import Pricing from "./pages/Pricing";
 import Print from "./pages/Print";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 import { isFirstVisit, markFirstVisitComplete } from "@/lib/storage";
 
@@ -39,6 +41,7 @@ function AppWrapper() {
           <Route path="/trips" element={<Trips />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/print" element={<Print />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </PageTransition>
@@ -47,15 +50,17 @@ function AppWrapper() {
 }
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AppWrapper />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppWrapper />
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

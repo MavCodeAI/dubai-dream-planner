@@ -4,12 +4,14 @@ import { getCurrentTrip } from '@/lib/storage';
 import { Trip, EMIRATES } from '@/types';
 import { Button } from '@/components/ui/button';
 import { EmptyMapState } from '@/components/EmptyStates';
-import { MapPin, ExternalLink, Navigation } from 'lucide-react';
+import { MapPin, ExternalLink, Navigation, Clock, DollarSign } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
+import { getLocationsByCity, LocationData } from '@/lib/map-data';
 
 export default function MapPage() {
   const navigate = useNavigate();
   const [trip, setTrip] = useState<Trip | null>(null);
+  const [locations, setLocations] = useState<LocationData[]>([]);
 
   useEffect(() => {
     const currentTrip = getCurrentTrip();
@@ -18,6 +20,11 @@ export default function MapPage() {
       return;
     }
     setTrip(currentTrip);
+    
+    // Get all locations for the cities in the trip
+    const allCities = [...new Set(currentTrip.days.map(d => d.city))];
+    const allLocations = allCities.flatMap(city => getLocationsByCity(city));
+    setLocations(allLocations);
   }, [navigate]);
 
   if (!trip) {
@@ -43,6 +50,11 @@ export default function MapPage() {
     const uniqueCities = [...new Set(trip.days.map((d) => getCityName(d.city)))];
     const query = uniqueCities.join(' to ') + ', UAE';
     const url = `https://www.google.com/maps/dir/${encodeURIComponent(query)}`;
+    window.open(url, '_blank');
+  };
+
+  const openLocationInMaps = (location: LocationData) => {
+    const url = `https://www.google.com/maps/search/?api=1&query=${location.coordinates.lat},${location.coordinates.lng}`;
     window.open(url, '_blank');
   };
 
@@ -79,9 +91,51 @@ export default function MapPage() {
           </div>
         </div>
 
-        {/* Stop List */}
+        {/* Available Locations in Trip Cities */}
         <div className="bg-card rounded-2xl border border-border p-6 shadow-lg">
-          <h3 className="text-xl font-semibold text-navy mb-4">All Stops ({allStops.length})</h3>
+          <h3 className="text-xl font-semibold text-navy mb-4">Available Attractions ({locations.length})</h3>
+          
+          {locations.length === 0 ? (
+            <p className="text-center text-muted-foreground py-6">
+              No locations found for your trip cities.
+            </p>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              {locations.map((location) => (
+                <div
+                  key={location.id}
+                  className="p-4 rounded-xl bg-muted/30 border border-border/50 hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h4 className="font-medium text-foreground mb-1">{location.name}</h4>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                        <MapPin className="w-3 h-3" />
+                        <span>{location.city.charAt(0).toUpperCase() + location.city.slice(1)}</span>
+                        <span>•</span>
+                        <span className="capitalize">{location.type}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground line-clamp-2">{location.description}</p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => openLocationInMaps(location)}
+                      className="ml-2 gap-1"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      Map
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Stop List */}
+        <div className="bg-card rounded-2xl border border-border p-6 shadow-lg mt-6">
+          <h3 className="text-xl font-semibold text-navy mb-4">Your Planned Stops ({allStops.length})</h3>
           
           <div className="space-y-3">
             {allStops.length === 0 ? (
@@ -106,6 +160,16 @@ export default function MapPage() {
                       <span>Day {stop.dayNumber}</span>
                       <span>•</span>
                       <span>{format(parseISO(stop.date), 'MMM d')}</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        <span>{stop.durationHours}h</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <DollarSign className="w-3 h-3" />
+                        <span>${stop.estimatedCostUSD}</span>
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -13,6 +13,8 @@ import {
   Mountain
 } from 'lucide-react';
 import { isFirstVisit } from '@/lib/storage';
+import { useAnalytics } from '@/lib/analytics';
+import { useEffect } from 'react';
 
 const features = [
   {
@@ -45,7 +47,23 @@ const stats = [
 
 export default function Index() {
   const navigate = useNavigate();
+  const analytics = useAnalytics();
   const showFirstTimeBanner = isFirstVisit();
+
+  useEffect(() => {
+    analytics.page('home');
+  }, [analytics]);
+
+  const handleStartPlanning = () => {
+    analytics.trackClick('start_planning_button', 'hero_section');
+    analytics.trackFeature('trip_planning', 'start');
+    navigate('/onboarding');
+  };
+
+  const handleViewTrips = () => {
+    analytics.trackClick('view_saved_trips_button', 'hero_section');
+    navigate('/trips');
+  };
 
   return (
     <div className="min-h-screen">
@@ -89,7 +107,7 @@ export default function Index() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
             <Button
               size="lg"
-              onClick={() => navigate('/onboarding')}
+              onClick={handleStartPlanning}
               className="bg-white text-primary hover:bg-white/90 gap-2 text-lg px-8 py-6 rounded-xl shadow-xl"
             >
               Start Planning
@@ -98,7 +116,7 @@ export default function Index() {
             <Button
               size="lg"
               variant="outline"
-              onClick={() => navigate('/trips')}
+              onClick={handleViewTrips}
               className="border-white/30 text-white hover:bg-white/10 gap-2 text-lg px-8 py-6 rounded-xl"
             >
               View Saved Trips

@@ -55,6 +55,7 @@ import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { MOCK_ACTIVITIES } from '@/data/activities';
+import { exportToPDF } from '@/lib/pdf-export';
 
 export default function Itinerary() {
   const navigate = useNavigate();
@@ -153,14 +154,20 @@ export default function Itinerary() {
     });
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     if (!isPro) {
       setUpgradeFeature('export PDF');
       setShowUpgradeModal(true);
       return;
     }
-    // Open print route in new tab for Pro users
-    window.open('/print', '_blank');
+    
+    try {
+      toast.loading('Generating PDF...', { id: 'pdf-export' });
+      await exportToPDF(trip);
+      toast.success('PDF exported successfully!', { id: 'pdf-export' });
+    } catch (error) {
+      toast.error('Failed to export PDF. Please try again.', { id: 'pdf-export' });
+    }
   };
 
   const handleUpgrade = () => {
