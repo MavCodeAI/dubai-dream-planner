@@ -13,6 +13,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { EmptyTripsState } from '@/components/EmptyStates';
 import {
   Calendar,
   Users,
@@ -44,7 +45,9 @@ export default function Trips() {
     deleteTrip(deleteConfirm);
     setTrips(getSavedTrips());
     setDeleteConfirm(null);
-    toast.success('Trip deleted');
+    toast.success('Trip deleted successfully', {
+      description: 'The trip has been removed from your collection'
+    });
   };
 
   const getCityNames = (cityIds: string[]) => {
@@ -65,16 +68,7 @@ export default function Trips() {
         </div>
 
         {trips.length === 0 ? (
-          <div className="bg-card rounded-2xl border border-border p-12 text-center shadow-lg">
-            <Compass className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <h2 className="text-xl font-semibold text-navy mb-2">No saved trips yet</h2>
-            <p className="text-muted-foreground mb-6">
-              Start planning your UAE adventure and save your itinerary here.
-            </p>
-            <Button onClick={() => navigate('/onboarding')} className="btn-gradient">
-              Plan Your Trip
-            </Button>
-          </div>
+          <EmptyTripsState />
         ) : (
           <div className="space-y-4">
             {trips.map((trip) => (

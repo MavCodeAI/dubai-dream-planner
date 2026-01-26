@@ -29,6 +29,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import UpgradeModal from '@/components/UpgradeModal';
+import { DaySkeleton } from '@/components/LoadingStates';
+import { EmptyActivitiesState } from '@/components/EmptyStates';
 import {
   Calendar,
   Users,
@@ -64,6 +66,7 @@ export default function Itinerary() {
   const [upgradeFeature, setUpgradeFeature] = useState('');
   const [isPro, setIsPro] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [regeneratingDay, setRegeneratingDay] = useState<number | null>(null);
   
   // Activity dialogs
   const [addActivityDay, setAddActivityDay] = useState<number | null>(null);
@@ -102,11 +105,13 @@ export default function Itinerary() {
       setTrip(updated);
       saveCurrentTrip(updated);
       setEditingName(false);
-      toast.success('Trip name updated');
+      toast.success('Trip name updated successfully', {
+        description: `Your trip is now named "${tripName.trim()}"`
+      });
     }
   };
 
-  const handleRegenerateDay = (dayNumber: number) => {
+  const handleRegenerateDay = async (dayNumber: number) => {
     // Check if user is pro for unlimited regeneration
     if (!isPro) {
       setUpgradeFeature('unlimited itinerary regeneration');
@@ -114,10 +119,18 @@ export default function Itinerary() {
       return;
     }
     
+    setRegeneratingDay(dayNumber);
+    
+    // Add fake delay for UX polish
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
     const updated = regenerateDay(trip, dayNumber);
     setTrip(updated);
     saveCurrentTrip(updated);
-    toast.success(`Day ${dayNumber} regenerated!`);
+    setRegeneratingDay(null);
+    toast.success(`Day ${dayNumber} regenerated successfully!`, {
+        description: 'New activities have been generated for this day'
+      });
   };
 
   const handleToggleDay = (dayNumber: number) => {
@@ -135,7 +148,9 @@ export default function Itinerary() {
       return;
     }
     saveTrip(trip);
-    toast.success('Trip saved to this device.');
+    toast.success('Trip saved successfully!', {
+      description: 'Your trip has been saved to this device'
+    });
   };
 
   const handleExportPDF = () => {
@@ -151,7 +166,9 @@ export default function Itinerary() {
   const handleUpgrade = () => {
     upgradeToPro();
     setIsPro(true);
-    toast.success('Welcome to Pro! Enjoy unlimited features.');
+    toast.success('Welcome to Pro! 🎉', {
+      description: 'Enjoy unlimited features and premium benefits'
+    });
   };
 
   const handleShareTrip = () => {
@@ -183,7 +200,9 @@ export default function Itinerary() {
     setTrip(updated);
     saveCurrentTrip(updated);
     setAddActivityDay(null);
-    toast.success('Activity added!');
+    toast.success('Activity added successfully!', {
+      description: `${activity.name} has been added to Day ${addActivityDay}`
+    });
   };
 
   const handleAddCustomActivity = () => {
@@ -239,7 +258,9 @@ export default function Itinerary() {
     setTrip(updated);
     saveCurrentTrip(updated);
     setEditingActivity(null);
-    toast.success('Activity updated!');
+    toast.success('Activity updated successfully!', {
+      description: 'Your changes have been saved'
+    });
   };
 
   const handleRemoveActivity = () => {
@@ -266,7 +287,9 @@ export default function Itinerary() {
     setTrip(updated);
     saveCurrentTrip(updated);
     setDeleteConfirm(null);
-    toast.success('Activity removed');
+    toast.success('Activity removed successfully', {
+      description: 'The activity has been removed from your itinerary'
+    });
   };
 
   const handleMoveActivity = (dayNumber: number, activityId: string, direction: 'up' | 'down') => {
@@ -417,6 +440,7 @@ export default function Itinerary() {
               key={day.dayNumber}
               day={day}
               isOpen={openDays.includes(day.dayNumber)}
+              isRegenerating={regeneratingDay === day.dayNumber}
               onToggle={() => handleToggleDay(day.dayNumber)}
               onRegenerate={() => handleRegenerateDay(day.dayNumber)}
               onAddActivity={() => setAddActivityDay(day.dayNumber)}
@@ -608,7 +632,9 @@ export default function Itinerary() {
                 onClick={() => {
                   const shareText = `I planned my UAE trip using this tool. Try it here: ${window.location.origin || 'https://uaetourplanner.com'}`;
                   navigator.clipboard.writeText(shareText);
-                  toast.success('Trip link copied to clipboard!');
+                  toast.success('Trip link copied to clipboard!', {
+                    description: 'Share the link with friends and family'
+                  });
                   setShowShareModal(false);
                 }}
                 className="flex-1"
@@ -637,6 +663,7 @@ export default function Itinerary() {
 interface DayCardProps {
   day: DayPlan;
   isOpen: boolean;
+  isRegenerating: boolean;
   onToggle: () => void;
   onRegenerate: () => void;
   onAddActivity: () => void;
@@ -650,6 +677,7 @@ interface DayCardProps {
 function DayCard({
   day,
   isOpen,
+  isRegenerating,
   onToggle,
   onRegenerate,
   onAddActivity,
@@ -720,10 +748,10 @@ function DayCard({
 
             {/* Activities */}
             <div className="space-y-3">
-              {day.activities.length === 0 ? (
-                <p className="text-center text-muted-foreground py-6">
-                  No activities planned. Add some activities!
-                </p>
+              {isRegenerating ? (
+                <DaySkeleton />
+              ) : day.activities.length === 0 ? (
+                <EmptyActivitiesState onAddActivity={onAddActivity} />
               ) : (
                 day.activities.map((activity, index) => (
                   <div

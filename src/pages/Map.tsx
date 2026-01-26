@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getCurrentTrip } from '@/lib/storage';
 import { Trip, EMIRATES } from '@/types';
 import { Button } from '@/components/ui/button';
+import { EmptyMapState } from '@/components/EmptyStates';
 import { MapPin, ExternalLink, Navigation } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
@@ -13,13 +14,15 @@ export default function MapPage() {
   useEffect(() => {
     const currentTrip = getCurrentTrip();
     if (!currentTrip) {
-      navigate('/onboarding');
+      // Show empty state instead of redirecting
       return;
     }
     setTrip(currentTrip);
   }, [navigate]);
 
-  if (!trip) return null;
+  if (!trip) {
+    return <EmptyMapState />;
+  }
 
   const getCityName = (cityId: string) => {
     return EMIRATES.find((e) => e.id === cityId)?.name || cityId;

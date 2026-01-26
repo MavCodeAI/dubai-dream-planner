@@ -86,7 +86,9 @@ export default function Onboarding() {
       
       const trip = generateItinerary(data);
       saveCurrentTrip(trip);
-      toast.success('Your itinerary has been generated!');
+      toast.success('Your perfect UAE itinerary has been generated! 🎉', {
+        description: 'Get ready for an amazing adventure through the Emirates'
+      });
       navigate('/itinerary');
     }
   };
