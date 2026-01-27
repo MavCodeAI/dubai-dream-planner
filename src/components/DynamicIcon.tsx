@@ -13,6 +13,7 @@ import {
   Utensils,
   Camera,
   Moon,
+  HelpCircle,
   LucideIcon
 } from 'lucide-react';
 
@@ -31,6 +32,7 @@ const iconMap: Record<string, LucideIcon> = {
   Utensils,
   Camera,
   Moon,
+  HelpCircle,
 };
 
 interface DynamicIconProps {
@@ -41,8 +43,11 @@ interface DynamicIconProps {
 export function DynamicIcon({ name, className }: DynamicIconProps) {
   const Icon = iconMap[name];
   
+  // Return fallback icon if not found
+  const FallbackIcon = iconMap['HelpCircle'];
+  
   if (!Icon) {
-    return <div className={className} />;
+    return <FallbackIcon className={className} />;
   }
   
   return <Icon className={className} />;

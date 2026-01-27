@@ -244,7 +244,7 @@ const AgenticChat: React.FC = () => {
   }, [handleSendMessage]);
 
   const handleViewFullItinerary = useCallback((itinerary: ItineraryMetadata) => {
-    localStorage.setItem('currentItinerary', JSON.stringify(itinerary));
+    localStorage.setItem('uae-tour-planner-v1', JSON.stringify(itinerary));
     navigate('/itinerary');
     analytics.trackFeature('agentic_itinerary_view', 'complete');
   }, [navigate, analytics]);

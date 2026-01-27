@@ -34,7 +34,7 @@ const ItineraryCard: React.FC<ItineraryCardProps> = ({ itinerary, onViewFullItin
       </div>
       <div className="flex items-center gap-2">
         <DollarSign className="w-4 h-4" />
-        <span>AED {itinerary.totalCost}</span>
+        <span>USD {itinerary.totalCost}</span>
       </div>
       <div className="flex items-center gap-2">
         <Users className="w-4 h-4" />

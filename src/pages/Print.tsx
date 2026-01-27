@@ -21,9 +21,17 @@ export default function Print() {
     
     // Auto-trigger print for Pro users after content loads
     if (isProUser()) {
-      setTimeout(() => {
+      // Use print event listener for better timing
+      const handlePrint = () => {
         window.print();
-      }, 500);
+        window.removeEventListener('afterprint', handlePrint);
+      };
+      window.addEventListener('afterprint', handlePrint);
+      // Fallback timeout
+      setTimeout(() => {
+        window.removeEventListener('afterprint', handlePrint);
+        window.print();
+      }, 1000);
     }
   }, [navigate]);
 

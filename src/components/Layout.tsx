@@ -36,7 +36,7 @@ export function Layout({ children }: LayoutProps) {
       <footer className="py-8 px-4 border-t border-border bg-background">
         <div className="container max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-muted-foreground text-sm">
-            © 2024 UAE Tour Planner. All rights reserved.
+            © {new Date().getFullYear()} UAE Tour Planner. All rights reserved.
           </p>
           <a 
             href={feedbackMailto}

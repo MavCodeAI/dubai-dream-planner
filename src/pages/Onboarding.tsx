@@ -86,7 +86,9 @@ export default function Onboarding() {
       case 1:
         return data.cities.length > 0;
       case 2:
-        return data.startDate && data.endDate;
+        if (!data.startDate || !data.endDate) return false;
+        // Validate that endDate is after startDate
+        return new Date(data.endDate) > new Date(data.startDate);
       case 3:
         return data.adults >= 1;
       case 4:

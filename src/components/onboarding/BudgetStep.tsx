@@ -24,7 +24,9 @@ export function BudgetStep({
     ? differenceInDays(parseISO(endDate), parseISO(startDate)) + 1
     : 1;
 
-  const dailyBudgetPerPerson = Math.round(budgetUSD / numberOfDays / totalTravelers);
+  // Guard against division by zero
+  const safeTotalTravelers = totalTravelers > 0 ? totalTravelers : 1;
+  const dailyBudgetPerPerson = Math.round(budgetUSD / numberOfDays / safeTotalTravelers);
 
   return (
     <StepContainer

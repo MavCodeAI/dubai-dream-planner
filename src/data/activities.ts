@@ -453,7 +453,7 @@ export const MOCK_ACTIVITIES: Activity[] = [
     luxuryLevel: 'mid',
   },
   {
-    id: 'uaq-mangroves',
+    id: 'umm-al-quwain-mangroves',
     name: 'Mangrove Kayaking',
     city: 'umm-al-quwain',
     description: 'Paddle through scenic mangrove forests and spot wildlife.',

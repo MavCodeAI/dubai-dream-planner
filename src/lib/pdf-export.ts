@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { parseISO } from 'date-fns';
 import { Trip, DayPlan } from '@/types';
 
 export async function exportToPDF(trip: Trip): Promise<void> {
@@ -46,7 +47,7 @@ export async function exportToPDF(trip: Trip): Promise<void> {
     pdf.setFont('helvetica', 'normal');
     const summaryLines = [
       `Cities: ${trip.onboardingData.cities.map(city => city.charAt(0).toUpperCase() + city.slice(1)).join(', ')}`,
-      `Dates: ${new Date(trip.onboardingData.startDate).toLocaleDateString()} - ${new Date(trip.onboardingData.endDate).toLocaleDateString()}`,
+      `Dates: ${parseISO(trip.onboardingData.startDate).toLocaleDateString()} - ${parseISO(trip.onboardingData.endDate).toLocaleDateString()}`,
       `Budget: $${trip.onboardingData.budgetUSD.toLocaleString()}`,
       `Pace: ${trip.onboardingData.pace.charAt(0).toUpperCase() + trip.onboardingData.pace.slice(1)}`,
       `Interests: ${trip.onboardingData.interests.map(interest => interest.charAt(0).toUpperCase() + interest.slice(1)).join(', ')}`

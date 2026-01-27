@@ -62,9 +62,7 @@ export default function Trips() {
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-navy mb-2">Saved Trips</h1>
           <p className="text-muted-foreground">Your UAE travel collection</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Trips are saved on this device (localStorage).
-          </p>
+
         </div>
 
         {trips.length === 0 ? (
@@ -84,7 +82,7 @@ export default function Trips() {
                         <Calendar className="w-4 h-4 text-primary" />
                         <span>
                           {format(parseISO(trip.onboardingData.startDate), 'MMM d')} -{' '}
-                          {format(parseISO(trip.onboardingData.endDate), 'd')}
+                          {format(parseISO(trip.onboardingData.endDate), 'MMM d, yyyy')}
                         </span>
                       </div>
                       <div className="flex items-center gap-1">

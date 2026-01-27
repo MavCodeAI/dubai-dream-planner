@@ -90,9 +90,6 @@ class AIClientError extends Error {
 export const aiClient = {
   /**
    * Send a chat message to the AI assistant
-   */
-  /**
-   * Send a chat message to the AI assistant
    * 
    * @param message - The user's message
    * @param context - Optional context for the conversation
@@ -132,9 +129,6 @@ export const aiClient = {
     return data as ChatResponse;
   },
 
-  /**
-   * Generate an AI-powered itinerary
-   */
   /**
    * Generate an AI-powered itinerary
    * 
@@ -193,9 +187,6 @@ export const aiClient = {
 
   /**
    * Get AI-powered activity suggestions
-   */
-  /**
-   * Get AI-powered activity suggestions
    * 
    * @param params - Suggestion parameters
    * @returns Promise resolving to activity suggestions with budget analysis
@@ -244,9 +235,6 @@ export const aiClient = {
     return data as SuggestionResponse;
   },
 
-  /**
-   * Stream chat response for real-time display
-   */
   /**
    * Stream chat response for real-time display
    * Streams tokens as they arrive from the AI

@@ -47,8 +47,12 @@ function AppWrapper() {
 
   useEffect(() => {
     if (isFirstVisit()) {
-      setShouldRedirectToOnboarding(true);
-      markFirstVisitComplete();
+      // Check if user explicitly wants to see landing page
+      const showLanding = new URLSearchParams(window.location.search).get('show_landing');
+      if (showLanding !== 'true') {
+        setShouldRedirectToOnboarding(true);
+        markFirstVisitComplete();
+      }
     }
   }, []);
 

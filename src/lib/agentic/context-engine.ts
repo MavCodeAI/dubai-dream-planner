@@ -237,7 +237,7 @@ class ContextEngine {
         id: `budget_tip_${Date.now()}`,
         type: 'tip',
         title: 'Budget Optimization',
-        description: `Based on your ${state.currentIntent.budget} budget, here are some cost-effective activities...`,
+        description: `Based on your ${state.currentIntent.budget?.amount?.toLocaleString() || state.currentIntent.budget} budget, here are some cost-effective activities...`,
         priority: 'medium',
         relevanceScore: 0.8,
         context: 'budget_planning',

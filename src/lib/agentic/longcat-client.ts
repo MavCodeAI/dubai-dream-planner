@@ -60,7 +60,7 @@ export interface LongCatError {
  * ```
  */
 export class LongCatClient {
-  private baseUrl = 'https://api.longcat.chat/openai';
+  private baseUrl = import.meta.env.VITE_LONGCAT_API_URL || 'https://api.longcat.chat/openai';
   private apiKey: string | null = null;
   private defaultModel = 'LongCat-Flash-Chat';
   private rateLimiter: Map<string, number[]> = new Map();
