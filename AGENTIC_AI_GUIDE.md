@@ -1,360 +1,578 @@
-# UAE Tour Planner - Agentic AI Architecture Guide
+# Dubai Dream Planner - Agentic AI Architecture Guide
 
 ## Overview
 
-This document explains the comprehensive Agentic AI implementation that transforms the UAE Tour Planner from a simple form-based app to an intelligent, conversational travel planning assistant.
+This document explains the comprehensive Agentic AI implementation that transforms the Dubai Dream Planner from a simple form-based app to an intelligent, conversational travel planning assistant with autonomous agent capabilities.
 
 ## What is Agentic AI?
 
 **Traditional AI:** User fills form → App generates itinerary → Done
 
-**Agentic AI:** User says "میں دبئی جانا چاہتا ہوں اگلے ہفتے" → AI understands intent → Researches weather → Finds activities → Plans budget → Creates optimized itinerary → Asks clarifying questions → Self-corrects → Complete plan
+**Agentic AI:** User says "میں دبئی جانا چاہتا ہوں اگلے ہفتے" → AI understands intent → Researches weather → Finds activities → Plans budget → Creates optimized itinerary → Asks clarifying questions → Self-corrects → Learns preferences → Complete plan
 
-## Architecture Overview
+## Four-Phase Agentic Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    USER INTERFACE                           │
-│  "میں دبئی جانا چاہتا ہوں اگلے ہفتے"                          │
-└────────────────────────┬─────────────────────────────────────┘
-                         ↓
-┌─────────────────────────────────────────────────────────────┐
-│              AI GATEWAY (Lovable AI)                         │
-│  • Intent Understanding                                     │
-│  • Natural Language Processing                              │
-│  • Structured Output Generation                            │
-└────────────────────────┬─────────────────────────────────────┘
-                         ↓
-┌─────────────────────────────────────────────────────────────┐
-│              AGENTIC ORCHESTRATOR                           │
-│  • Workflow Management                                      │
-│  • Agent Coordination                                      │
-│  • State Management                                         │
-└────────────────────────┬─────────────────────────────────────┘
-                         ↓
-┌─────────────────────────────────────────────────────────────┐
-│                   SPECIALIZED AGENTS                         │
-│                                                            │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │   Weather    │  │   Activity   │  │    Budget    │     │
-│  │    Agent     │  │    Agent     │  │    Agent     │     │
-│  │              │  │              │  │              │     │
-│  │ OpenWeather  │  │  Local DB    │  │ Cost Analysis│     │
-│  │     API      │  │              │  │              │     │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘     │
-│         │                 │                 │              │
-│         └─────────────────┼─────────────────┘              │
-│                           ↓                                │
-│              ┌──────────────────────┐                      │
-│              │   Planning Agent     │                      │
-│              │   Itinerary Builder  │                      │
-│              └──────────┬───────────┘                      │
-└─────────────────────────┼──────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────────┐
-│                    FINAL OUTPUT                            │
-│  • Complete Itinerary                                      │
-│  • Budget Breakdown                                        │
-│  • Weather Recommendations                                 │
-│  • Activity Suggestions                                    │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          USER INTERFACE                                      │
+│  "میں دبئی جانا چاہتا ہوں اگلے ہفتے 2 بالغ، 1 بچہ، $3000 بجٹ"               │
+└────────────────────────────┬────────────────────────────────────────────────┘
+                             ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    AGENTIC ORCHESTRATOR (Phase 1-4)                         │
+│  • Proactive Intelligence Layer    • Task Automation Layer                  │
+│  • Multi-Agent Coordination        • Learning & Persistence                  │
+└────────────────────────────┬────────────────────────────────────────────────┘
+                             ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          PHASE 1: PROACTIVE INTELLIGENCE                     │
+│                                                                             │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────────────────┐  │
+│  │  Context Engine │  │ Trigger System  │  │  Notification Manager       │  │
+│  │                 │  │                 │  │                             │  │
+│  │ • Session state │  │ • Time-based    │  │  • Toast notifications      │  │
+│  │ • User behavior │  │ • Event-based   │  │  • In-app center            │  │
+│  │ • Preferences   │  │ • Behavior      │  │  • Preferences storage      │  │
+│  └────────┬────────┘  └────────┬────────┘  └─────────────┬───────────────┘  │
+│           │                    │                          │                   │
+│           └────────────────────┼──────────────────────────┘                   │
+│                                ↓                                             │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │              Context-Aware Suggestions & Proactive Tips                 │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────┘
+                             ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          PHASE 2: TASK AUTOMATION                            │
+│                                                                             │
+│  ┌─────────────────┐  ┌─────────────────────────┐  ┌─────────────────────┐ │
+│  │  Action Agent   │  │  Booking Workflow       │  │   State Machine     │ │
+│  │                 │  │  Manager                │  │                     │ │
+│  │ • Book/Reserve  │  │  • Multi-step flow      │  │  • State tracking   │ │
+│  │ • Purchase      │  │  • Confirmation         │  │  • Persistence      │ │
+│  │ • Inquire       │  │  • Cancellation         │  │  • Resume workflows │ │
+│  │ • Cancel        │  │  • Modification         │  │  • Session sync     │ │
+│  └────────┬────────┘  └───────────┬─────────────┘  └──────────┬──────────┘ │
+│           │                       │                            │              │
+│           └───────────────────────┼────────────────────────────┘              │
+│                                   ↓                                          │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │              External API Integrations & Transaction Management         │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────┘
+                             ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     PHASE 3: MULTI-AGENT COORDINATION                       │
+│                                                                             │
+│  ┌─────────────────────┐  ┌──────────────────────┐  ┌─────────────────────┐ │
+│  │  Agent Bus          │  │  Shared Context      │  │  Dynamic Router     │ │
+│  │  (Communication)    │  │  Store               │  │                     │ │
+│  │                     │  │                      │  │                     │ │
+│  │ • Message passing   │  │  • Real-time state   │  │  • Intent routing   │ │
+│  │ • Event-driven      │  │  • Conflict resolve  │  │  • Agent spawning   │ │
+│  │ • Agent discovery   │  │  • Context merging   │  │  • Complexity       │ │
+│  └──────────┬──────────┘  └───────────┬──────────┘  └──────────┬──────────┘ │
+│             │                         │                         │              │
+│             └─────────────────────────┼─────────────────────────┘              │
+│                                       ↓                                        │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │              Parallel Agent Processing & Coordination                     ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────────────────┘
+                             ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      PHASE 4: LEARNING & PERSISTENCE                         │
+│                                                                             │
+│  ┌─────────────────────────┐  ┌─────────────────────────────────────────┐   │
+│  │  User Preference        │  │  Session Continuity Manager             │   │
+│  │  Learner                │  │                                         │   │
+│  │                         │  │  • Resume interrupted workflows         │   │
+│  │  • Store preferences    │  │  • Auto-save chat context               │   │
+│  │  • Learn from corrections│  │  • Restore previous session state      │   │
+│  │  • Build user profile   │  │  • Session persistence                  │   │
+│  └────────────┬────────────┘  └────────────────────┬──────────────────────┘   │
+│               │                                      │                         │
+│               └──────────────────────────────────────┘                         │
+│                                       ↓                                        │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │              Personalized, Persistent User Experience                     ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────────────────┘
+                             ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    SPECIALIZED AGENTS (Existing)                            │
+│                                                                             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐   │
+│  │   Weather    │  │   Activity   │  │    Budget    │  │    Planning  │   │
+│  │    Agent     │  │    Agent     │  │    Agent     │  │    Agent     │   │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────┘
+                             ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         FINAL OUTPUT                                        │
+│  • Complete Itinerary           • Budget Breakdown                          │
+│  • Proactive Suggestions        • Personalized Recommendations              │
+│  • Booking Actions              • Session Continuity                        │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Core Components
+## Phase 1: Proactive Intelligence Layer
 
-### 1. AI Gateway (`src/lib/agentic/ai-gateway.ts`)
+### 1.1 Context Engine (`src/lib/agentic/context-engine.ts`)
 
-**Purpose:** Interface with Lovable AI for LLM capabilities
+**Purpose:** Track user session state, behavior patterns, and provide context-aware suggestions.
 
 **Features:**
-- Natural language understanding (Urdu/English)
-- Intent extraction from user messages
-- Structured JSON output generation
-- Travel question answering
+- Session state tracking (userId, sessionId, messages, activities)
+- Trip context management (current trip, dates, budget)
+- Activity history (viewed, booked, favorites)
+- Behavior pattern detection (frequent queries, preferences)
+- Contextual suggestions based on user state
 
 **Example Usage:**
 ```typescript
-const intent = await aiGateway.extractTravelIntent("میں دبئی جانا چاہتا ہوں اگلے ہفتے، 2 بالغ، 1 بچہ، $3000 بجٹ");
-// Returns: { city: "dubai", dates: {...}, travelers: {...}, budget: {...} }
+import { contextEngine } from './context-engine';
+
+// Initialize session
+await contextEngine.initializeSession(userId);
+
+// Track activity view
+contextEngine.trackActivityView(activityId);
+
+// Get contextual suggestions
+const suggestions = contextEngine.getContextualSuggestions();
 ```
 
-### 2. Agentic Orchestrator (`src/lib/agentic/orchestrator.ts`)
+### 1.2 Trigger System (`src/lib/agentic/triggers/`)
 
-**Purpose:** Manages the complete workflow and coordinates all agents
+**Purpose:** Time-based, event-based, and behavior-based triggers for proactive intelligence.
 
-**Workflow Steps:**
-1. **Understanding** - Extract user intent
-2. **Researching** - Gather information from agents
-3. **Planning** - Generate itinerary and suggestions
-4. **Finalizing** - Validate and optimize plan
+**Types:**
+- **Time Triggers:** Trip approaching, booking reminders
+- **Event Triggers:** Weather changes, price drops, availability changes
+- **Behavior Triggers:** Frequent queries, cart abandonment, engagement drops
+
+**Example Usage:**
+```typescript
+import { triggerManager } from './triggers';
+
+// Initialize trigger system
+await triggerManager.initialize();
+
+// Subscribe to trigger events
+triggerManager.subscribe((instance) => {
+  console.log('Trigger fired:', instance);
+});
+
+// Report behavior for behavior-based triggers
+triggerManager.reportBehavior('frequent_query', { queryCount: 7 });
+```
+
+### 1.3 Notification System (`src/lib/agentic/notifications/`)
+
+**Purpose:** Toast notifications, in-app notification center, and notification preferences.
 
 **Features:**
-- State management across conversation
-- Error handling and self-correction
-- Follow-up question generation
-- Progress tracking
+- Toast notifications (success, error, warning, info, proactive)
+- In-app notification center with read/unread states
+- Notification preferences (quiet hours, sound, vibration)
+- Price alerts, weather alerts, booking reminders
 
-### 3. Specialized Agents
+**Example Usage:**
+```typescript
+import { notificationManager } from './notifications/notification-manager';
 
-#### Weather Agent (`src/lib/agentic/agents/weather-agent.ts`)
-- Weather forecasting for trip dates
-- Activity suitability analysis
-- Best timing recommendations
-- Weather-based activity suggestions
+// Show notification
+notificationManager.showToast('Trip Reminder', 'Your trip is in 7 days!');
 
-#### Activity Agent (`src/lib/agentic/agents/activity-agent.ts`)
-- Curated database of UAE attractions
-- Activity filtering by interests and budget
-- Cost estimation
-- Family-friendly recommendations
+// Show proactive tip
+notificationManager.showProactiveTip(
+  'Personalized Tip',
+  'Based on your interests, Desert Safari is highly recommended!'
+);
 
-#### Budget Agent (`src/lib/agentic/agents/budget-agent.ts`)
-- Budget analysis and breakdown
-- Cost optimization suggestions
-- Spending recommendations
-- Budget warnings and insights
+// Get unread count
+const count = notificationManager.getUnreadCount();
+```
 
-#### Planning Agent (`src/lib/agentic/agents/planning-agent.ts`)
-- Itinerary generation and optimization
-- Day-by-day activity planning
-- Logical flow and timing
-- Validation and error correction
+### 1.4 Updated AgenticChat Component
 
-### 4. Agentic Chat Interface (`src/components/AgenticChat.tsx`)
+**Enhancements:**
+- Proactive suggestion display panel
+- Notification badge integration
+- Context engine suggestions integration
+- Real-time notification updates
 
-**Purpose:** User interface for conversational AI interaction
+## Phase 2: Task Automation Layer
+
+### 2.1 Action Agent (`src/lib/agentic/agents/action-agent.ts`)
+
+**Purpose:** Handle external API integrations for bookings, reservations, and purchases.
+
+**Action Types:**
+- `book` - Book an activity
+- `reserve` - Make a reservation
+- `purchase` - Purchase tickets/items
+- `inquire` - Send inquiry to provider
+- `cancel` - Cancel booking
+- `modify` - Modify booking
+- `query` - Query status
+
+**State Management:**
+- `pending` → `in_progress` → `confirmed` → `completed`
+- Or: `pending` → `failed` → `retry`
+
+**Example Usage:**
+```typescript
+import { actionAgent, createBooking } from './agents/action-agent';
+
+// Create booking action
+const action = await createBooking({
+  activityId: 'activity_123',
+  activityName: 'Desert Safari',
+  date: '2024-02-15',
+  time: '14:00',
+  participants: 4,
+  amount: 500,
+  currency: 'AED'
+});
+
+// Check status
+const status = action.status; // 'pending', 'confirmed', 'completed', etc.
+```
+
+### 2.2 Booking Workflow Manager (`src/lib/agentic/workflows/booking-workflow.ts`)
+
+**Purpose:** Multi-step transaction manager for bookings, confirmations, and modifications.
+
+**Workflow Types:**
+- `booking` - New booking workflow (6 steps)
+- `cancellation` - Cancellation workflow (5 steps)
+- `modification` - Modification workflow (5 steps)
 
 **Features:**
-- Real-time chat interface
-- Progress indicators
-- Quick action buttons
-- Urdu/English bilingual support
-- Rich message formatting (itinerary cards, suggestions, errors)
+- Step-by-step progress tracking
+- Data collection per step
+- Auto-progress capability
+- Retry and resume support
 
-## User Experience Flow
+### 2.3 State Machine (`src/lib/agentic/state-machine.ts`)
 
-### Traditional Flow (Before)
+**Purpose:** Track action states across sessions with persistence.
+
+**Features:**
+- State definitions (action, workflow, session)
+- State transitions with guards and actions
+- Persistence to localStorage
+- Resume interrupted workflows
+- Session continuity
+
+## Phase 3: Enhanced Multi-Agent Coordination
+
+### 3.1 Agent Communication Protocol (`src/lib/agentic/communication/agent-bus.ts`)
+
+**Purpose:** Event-driven message passing between agents.
+
+**Features:**
+- Message types: request, response, event, broadcast, query
+- Topic-based subscription (direct, wildcard, hierarchical)
+- Dead letter queue for failed messages
+- Message correlation for request/response
+
+**Example Usage:**
+```typescript
+import { agentBus, AGENTS, TOPICS } from './communication/agent-bus';
+
+// Register agent
+agentBus.registerAgent({
+  id: AGENTS.WEATHER,
+  name: 'weather_agent',
+  type: 'weather',
+  version: '1.0.0',
+  status: 'online',
+  capabilities: ['forecasts', 'alerts']
+});
+
+// Subscribe to topic
+agentBus.subscribe(AGENTS.WEATHER, [TOPICS.WEATHER_REQUEST], async (message) => {
+  // Handle weather request
+  return { result: weatherData };
+});
+
+// Broadcast event
+await agentBus.broadcast(TOPICS.WEATHER_UPDATE, { city: 'Dubai', condition: 'Sunny' });
+
+// Send request and wait for response
+const response = await agentBus.request(
+  AGENTS.WEATHER,
+  TOPICS.WEATHER_REQUEST,
+  { city: 'Dubai', date: '2024-02-15' }
+);
 ```
-User → Select City → Select Dates → Select Travelers → Set Budget → Choose Interests → Generate Itinerary
+
+### 3.2 Shared Context Store (`src/lib/agentic/shared-context.ts`)
+
+**Purpose:** Real-time state sharing during parallel agent processing.
+
+**Features:**
+- Context version tracking
+- Conflict detection and resolution
+- Multiple merge strategies (last-write-wins, deep merge, array concat)
+- History tracking
+
+### 3.3 Dynamic Agent Router (`src/lib/agentic/dynamic-router.ts`)
+
+**Purpose:** Spawn specialized agents based on complexity and route intents.
+
+**Features:**
+- Intent complexity analysis (simple, moderate, complex, very_complex)
+- Agent selection and spawning
+- Routing strategy determination (single, sequential, parallel, hybrid)
+- Resource estimation (cost, time)
+
+**Example Usage:**
+```typescript
+import { dynamicAgentRouter } from './dynamic-router';
+
+// Analyze intent complexity
+const analysis = dynamicAgentRouter.analyzeIntent(
+  'میں دبئی جانا چاہتا ہوں اگلے ہفتے'
+);
+// Returns: { complexity, requiredAgents, estimatedSteps, etc. }
+
+// Route intent to appropriate agents
+const decision = await dynamicAgentRouter.routeIntent(userMessage);
+// Returns: { primaryAgent, supportingAgents, parallelAgents, strategy, etc. }
 ```
 
-### Agentic Flow (After)
+## Phase 4: Learning & Persistence
+
+### 4.1 User Preference Learner (`src/lib/agentic/learning/preference-learner.ts`)
+
+**Purpose:** Learn and store preferences across sessions.
+
+**Features:**
+- Activity preferences (favorites, avoided, types)
+- Budget preferences (spending tendency, average)
+- Time preferences (pace, start time)
+- Travel preferences (trip type, cities, style)
+- Communication preferences (language, response style)
+- Confidence scoring
+- Pattern prediction
+
+**Example Usage:**
+```typescript
+import { preferenceLearner } from './learning/preference-learner';
+
+// Get or create user profile
+const profile = preferenceLearner.getOrCreateProfile(userId);
+
+// Learn from interaction
+preferenceLearner.learnFromInteraction(userId, {
+  message: 'میں فیملی کے ساتھ آ رہا ہوں',
+  feedback: 'positive'
+});
+
+// Get preferences
+const preferences = preferenceLearner.getPreferences(userId);
+
+// Predict next preference
+const prediction = preferenceLearner.predictNextPreference(userId);
 ```
-User: "میں دبئی جانا چاہتا ہوں اگلے ہفتے"
-     ↓
-AI: "سمجھ گیا! دبئی کے لیے منصوبہ بنایا جا رہا ہے..."
-     ↓
-AI: [Checks weather, finds activities, analyzes budget]
-     ↓
-AI: "آپ کا 7 دن کا دبئی منصوبہ تیار ہے! Burj Khalifa, Desert Safari, Dubai Mall..."
-     ↓
-User: "بچوں کے لیے کیا ہے؟"
-     ↓
-AI: [Updates plan with family-friendly activities]
+
+### 4.2 Session Continuity Manager (`src/lib/agentic/session-continuity.ts`)
+
+**Purpose:** Resume interrupted workflows and restore session state.
+
+**Features:**
+- Session lifecycle management (start, pause, resume, end)
+- Auto-save chat context
+- Pending action tracking
+- Workflow restoration
+- Session data export/import
+
+**Example Usage:**
+```typescript
+import { sessionContinuityManager } from './session-continuity';
+
+// Start session
+sessionContinuityManager.startSession(userId);
+
+// Save chat message
+sessionContinuityManager.saveChatMessage('user', userMessage);
+
+// Restore session (auto-called on page reload)
+const result = await sessionContinuityManager.restoreSession();
+// Returns: { success, restoredItems, errors }
+
+// End session
+sessionContinuityManager.endSession();
 ```
 
-## Key Features
+## File Structure
 
-### 1. Natural Language Understanding
-- Supports Urdu and English
-- Understands relative dates ("اگلے ہفتے")
-- Infers missing information
-- Handles conversational context
-
-### 2. Multi-Agent Coordination
-- Parallel information gathering
-- Agent collaboration
-- Conflict resolution
-- Consistent state management
-
-### 3. Self-Correction
-- Error detection and recovery
-- Plan validation
-- Budget constraint checking
-- Logical flow verification
-
-### 4. Personalization
-- Interest-based activity filtering
-- Budget-conscious recommendations
-- Family-friendly options
-- Weather-appropriate suggestions
-
-## Technical Implementation
-
-### File Structure
 ```
 src/lib/agentic/
-├── ai-gateway.ts          # LLM integration
-├── orchestrator.ts        # Workflow management
-└── agents/
-    ├── weather-agent.ts   # Weather information
-    ├── activity-agent.ts  # Activities and attractions
-    ├── budget-agent.ts    # Budget analysis
-    └── planning-agent.ts  # Itinerary generation
-
-src/components/
-└── AgenticChat.tsx        # Chat interface
+├── ai-gateway.ts                 # LLM integration (existing)
+├── orchestrator.ts               # Enhanced orchestrator (updated)
+├── context-engine.ts             # Phase 1: Context tracking
+├── state-machine.ts              # Phase 2: State management
+│
+├── triggers/
+│   ├── types.ts                  # Trigger type definitions
+│   └── index.ts                  # Trigger implementation
+│
+├── notifications/
+│   └── notification-manager.ts   # Phase 1: Notifications
+│
+├── agents/
+│   ├── weather-agent.ts          # Weather agent (existing)
+│   ├── activity-agent.ts         # Activity agent (existing)
+│   ├── budget-agent.ts           # Budget agent (existing)
+│   ├── planning-agent.ts         # Planning agent (existing)
+│   └── action-agent.ts           # Phase 2: Action execution
+│
+├── workflows/
+│   └── booking-workflow.ts       # Phase 2: Workflow management
+│
+├── communication/
+│   └── agent-bus.ts              # Phase 3: Agent communication
+│
+├── shared-context.ts             # Phase 3: Shared state
+├── dynamic-router.ts             # Phase 3: Intent routing
+│
+└── learning/
+    ├── preference-learner.ts     # Phase 4: Preference learning
+    └── session-continuity.ts     # Phase 4: Session persistence
 ```
-
-### Key Technologies
-- **Lovable AI Gateway** - LLM integration
-- **TypeScript** - Type safety
-- **React** - UI components
-- **Tailwind CSS** - Styling
-- **Lucide React** - Icons
-
-### API Integration
-```typescript
-// Environment variables needed
-VITE_LOVABLE_API_KEY=your_lovable_api_key_here
-VITE_OPENWEATHER_API_KEY=your_openweather_api_key_here
-```
-
-## Prompt Engineering Techniques
-
-### 1. Role Prompting
-```
-"You are a UAE travel expert AI assistant with 10 years of experience..."
-```
-
-### 2. Chain-of-Thought
-```
-"First think: 1. What is the user's intent? 2. What information is needed? 3. Which APIs to call?"
-```
-
-### 3. Few-Shot Examples
-```
-Input: "دبئی اگلے ہفتے"
-Output: {city: 'dubai', dates: '2024-02-01 to 2024-02-07'}
-```
-
-### 4. Structured Output
-```json
-{
-  "intent": "string",
-  "city": "string", 
-  "dates": {"start": "string", "end": "string"},
-  "travelers": {"adults": number, "children": number}
-}
-```
-
-## Error Handling
-
-### 1. Graceful Degradation
-- Missing API keys → Use mock data
-- Network errors → Show helpful messages
-- Invalid input → Ask clarifying questions
-
-### 2. Self-Correction
-- Budget overruns → Suggest alternatives
-- Weather conflicts → Recommend indoor activities
-- Logical errors → Re-plan automatically
-
-## Performance Optimization
-
-### 1. Parallel Processing
-- Multiple agents work simultaneously
-- Non-blocking API calls
-- Optimistic UI updates
-
-### 2. Caching
-- Weather data cached for 24 hours
-- Activity data stored locally
-- User preferences remembered
-
-### 3. Lazy Loading
-- Agents loaded on demand
-- Progressive enhancement
-- Minimal initial bundle
-
-## Future Enhancements
-
-### Phase 1 (Current)
-- ✅ Basic agentic architecture
-- ✅ Chat interface
-- ✅ Multi-agent coordination
-- ✅ Self-correction
-
-### Phase 2 (Next)
-- 🔄 Real-time flight/hotel APIs
-- 🔄 Booking integration
-- 🔄 Payment processing
-- 🔄 Advanced personalization
-
-### Phase 3 (Advanced)
-- 📋 Voice input/output
-- 📋 Multi-city planning
-- 📋 Group trip coordination
-- 📋 Real-time updates
-
-## Testing
-
-### Manual Testing
-1. Test basic conversation flow
-2. Test error scenarios
-3. Test budget constraints
-4. Test weather integration
-
-### Automated Testing
-```bash
-# TypeScript compilation check
-npm run type-check
-
-# Unit tests for agents
-npm run test
-
-# Integration tests
-npm run test:integration
-```
-
-## Deployment
-
-### Environment Setup
-1. Copy `.env.example` to `.env`
-2. Add API keys
-3. Build and deploy
-
-### Production Considerations
-- API rate limiting
-- Error monitoring
-- Performance tracking
-- User analytics
-
-## Conclusion
-
-The Agentic AI architecture transforms the UAE Tour Planner into a truly intelligent travel assistant that:
-
-- **Understands** natural language in Urdu/English
-- **Thinks** about user needs and constraints
-- **Researches** multiple data sources simultaneously  
-- **Plans** optimized itineraries automatically
-- **Corrects** errors and adjusts plans
-- **Learns** from user preferences
-
-This creates a conversational, intelligent, and personalized travel planning experience that goes far beyond traditional form-based applications.
 
 ## Usage Examples
 
-### Example 1: Simple Request
-```
-User: "میں دبئی جانا چاہتا ہوں"
-AI: "کب اور کتنے دن کے لیے؟"
-User: "اگلے ہفتے، 3 دن"
-AI: [Generates complete 3-day Dubai itinerary]
+### Example 1: Complete Proactive Flow
+```typescript
+// User starts session
+sessionContinuityManager.startSession(userId);
+
+// User makes request
+const state = await agenticOrchestrator.processUserMessage(
+  'میں دبئی جانا چاہتا ہوں اگلے ہفتے'
+);
+
+// Context engine generates suggestions
+const suggestions = contextEngine.getContextualSuggestions();
+
+// Trigger system monitors for proactive alerts
+triggerManager.reportBehavior('cart_abandonment', {
+  viewedActivities: 5,
+  bookedActivities: 0
+});
+
+// Notification shown
+notificationManager.showProactiveTip(
+  'Ready to Book?',
+  'You\'ve been looking at some great activities!'
+);
 ```
 
-### Example 2: Complex Request
-```
-User: "میں اپنے خاندان کے ساتھ ابو ظہبی جانا چاہتا ہوں، 2 بچے ہیں، بجٹ 5000 درہم"
-AI: [Analyzes family needs, finds kid-friendly activities, optimizes budget]
+### Example 2: Booking Workflow
+```typescript
+// Create booking workflow
+const workflow = bookingWorkflowManager.createBookingWorkflow({
+  activityId: 'activity_123',
+  activityName: 'Desert Safari',
+  date: '2024-02-15',
+  participants: 4,
+  amount: 500
+});
+
+// Start and progress through steps
+await bookingWorkflowManager.startWorkflow(workflow.id);
+await bookingWorkflowManager.progressWorkflow(workflow.id);
+await bookingWorkflowManager.completeWorkflow(workflow.id);
+
+// Action executed
+const action = await createBooking({
+  activityId: 'activity_123',
+  date: '2024-02-15',
+  participants: 4,
+  amount: 500
+});
 ```
 
-### Example 3: Follow-up Questions
-```
-User: "موسم کیسا ہو گا؟"
-AI: [Checks weather forecast, suggests appropriate activities]
-User: "کچھ سستی گیمز کریں"
-AI: [Updates plan with budget-friendly options]
+### Example 3: Multi-Agent Coordination
+```typescript
+// Analyze intent
+const analysis = dynamicAgentRouter.analyzeIntent(
+  'دبئی میں 5 دن کا فیملی ٹریپ، بجٹ 5000 درہم'
+);
+
+// Route to appropriate agents
+const decision = await dynamicAgentRouter.routeIntent(
+  'دبئی میں 5 دن کا فیملی ٹریپ، بجٹ 5000 درہم'
+);
+// { primaryAgent, supportingAgents, parallelAgents, strategy: 'parallel' }
+
+// Agents process in parallel via agent bus
+await agentBus.broadcast(TOPICS.TRIP_PLANNING, {
+  intent,
+  complexity: 'complex'
+});
+
+// Results merged in shared context
+const weather = sharedContextStore.get('weather');
+const activities = sharedContextStore.get('activities');
+const budget = sharedContextStore.get('budget');
 ```
 
-The agentic system handles all these scenarios intelligently, creating a natural and helpful travel planning experience.
+### Example 4: Learning and Continuity
+```typescript
+// Learn from user behavior
+preferenceLearner.learnFromInteraction(userId, {
+  message: 'مجھے ایڈونچر ایکٹیویٹیس پسند ہیں',
+  feedback: 'positive'
+});
+
+// Session restored on return
+const result = await sessionContinuityManager.restoreSession();
+// User's previous context, preferences, and workflows restored
+
+// Get personalized prediction
+const prediction = preferenceLearner.predictNextPreference(userId);
+// Predicts next preference based on learned patterns
+```
+
+## Testing
+
+```bash
+# TypeScript compilation
+npm run build
+
+# Unit tests
+npm run test
+
+# Run specific tests
+npm run test -- activity-agent.test.ts
+npm run test -- budget-agent.test.ts
+```
+
+## Future Enhancements
+
+### Phase 5 (Upcoming)
+- Voice input/output
+- Real-time flight/hotel APIs
+- Payment processing integration
+- Advanced AI model integration
+- Multi-language support expansion
+- Predictive analytics
+
+## Conclusion
+
+The enhanced Agentic AI architecture transforms Dubai Dream Planner into a truly intelligent travel assistant that:
+
+1. **Proactively** suggests relevant information based on context
+2. **Automates** bookings and transactions seamlessly
+3. **Coordinates** multiple agents in parallel for efficiency
+4. **Learns** from user behavior to personalize experiences
+5. **Persists** session state for continuity across visits
+
+This creates a conversational, intelligent, and personalized travel planning experience that goes far beyond traditional applications.
