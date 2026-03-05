@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.ai-suggest]
 verify_jwt = false
+
+[functions.ai-grok]
+verify_jwt = false
