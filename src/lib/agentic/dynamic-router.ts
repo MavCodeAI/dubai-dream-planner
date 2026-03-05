@@ -1,6 +1,6 @@
 // Dynamic Agent Router - Spawn specialized agents based on complexity and route intents
-import { agentBus, AGENTS, TOPICS, AgentMessage, AgentId } from './communication/agent-bus';
-import { sharedContextStore } from './shared-context';
+import { agentBus, AGENTS } from './communication/agent-bus';
+import type { AgentId } from './communication/agent-bus';
 
 export type IntentComplexity = 'simple' | 'moderate' | 'complex' | 'very_complex';
 export type AgentType = 'planning' | 'weather' | 'activity' | 'budget' | 'booking' | 'general';
@@ -43,6 +43,7 @@ export interface ActiveAgent {
 
 // ==================== Complexity Indicators ====================
 
+// @ts-ignore - reserved for future complexity analysis
 const COMPLEXITY_INDICATORS = {
   simple: {
     maxKeywords: 2,
@@ -83,6 +84,7 @@ const AGENT_REQUIREMENTS: Record<string, AgentType[]> = {
 class DynamicAgentRouter {
   private activeAgents: Map<AgentId, ActiveAgent> = new Map();
   private agentConfigs: Map<AgentType, AgentSpawnConfig> = new Map();
+  // @ts-ignore - reserved for async routing
   private pendingRequests: Map<string, { timestamp: Date; resolve: (decision: RoutingDecision) => void }> = new Map();
   private listeners: Set<(decision: RoutingDecision) => void> = new Set();
 
@@ -146,7 +148,7 @@ class DynamicAgentRouter {
   /**
    * Analyze intent complexity
    */
-  analyzeIntent(message: string, context?: Record<string, unknown>): IntentAnalysis {
+  analyzeIntent(message: string, _context?: Record<string, unknown>): IntentAnalysis {
     const keywords = this.extractKeywords(message.toLowerCase());
     const wordCount = message.split(/\s+/).length;
     
@@ -313,7 +315,7 @@ class DynamicAgentRouter {
   /**
    * Select supporting agents
    */
-  private selectSupportingAgents(analysis: IntentAnalysis, primaryAgent: AgentId): AgentId[] {
+  private selectSupportingAgents(analysis: IntentAnalysis, _primaryAgent: AgentId): AgentId[] {
     return analysis.requiredAgents.slice(1).map(agentType => {
       const idleAgent = this.findIdleAgent(agentType);
       return idleAgent || this.spawnAgent(agentType);

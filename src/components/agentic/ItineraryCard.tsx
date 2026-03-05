@@ -1,6 +1,4 @@
-import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Plane, MapPin, Calendar, DollarSign, Users } from 'lucide-react';
 
 interface ItineraryCardProps {

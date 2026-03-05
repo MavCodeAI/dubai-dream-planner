@@ -19,7 +19,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { agenticOrchestrator, AgenticState } from '@/lib/agentic/orchestrator';
-import { TravelIntent } from '@/lib/agentic/ai-gateway';
+// TravelIntent used internally by orchestrator
 import { languageDetector } from '@/lib/agentic/language-detector';
 import { useNavigate } from 'react-router-dom';
 import { useAnalytics } from '@/lib/analytics';
@@ -45,11 +45,11 @@ interface ItineraryMetadata {
         id: string;
         name: string;
         description: string;
-        category: string;
-        duration: number;
-        price: { adult: number; child: number; currency: string };
-        location: { city: string; area: string };
-        rating: number;
+        category?: string;
+        duration?: number;
+        price?: { adult: number; child: number; currency: string };
+        location?: { city: string; area: string };
+        rating?: number;
       };
       startTime: string;
       endTime: string;

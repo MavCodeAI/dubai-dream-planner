@@ -13,14 +13,27 @@ export interface OnboardingData {
 export interface Activity {
   id: string;
   name: string;
-  city: string;
+  city?: string;
   description: string;
-  durationHours: number;
-  estimatedCostUSD: number;
-  tags: string[];
-  timeOfDay: 'morning' | 'afternoon' | 'evening' | 'anytime';
-  familyFriendly: boolean;
-  luxuryLevel: 'budget' | 'mid' | 'lux';
+  durationHours?: number;
+  estimatedCostUSD?: number;
+  tags?: string[];
+  timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'anytime';
+  familyFriendly?: boolean;
+  luxuryLevel?: 'budget' | 'mid' | 'lux';
+  // Extended properties used by agents
+  category?: string;
+  duration?: number;
+  price?: { adult: number; child: number; currency: string };
+  location?: { city: string; area: string };
+  rating?: number;
+  reviews?: number;
+  images?: string[];
+  suitableFor?: string[];
+  bestTime?: string;
+  weatherDependent?: boolean;
+  bookingRequired?: boolean;
+  tips?: string[];
 }
 
 export interface DayPlan {

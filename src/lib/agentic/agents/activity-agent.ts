@@ -2,6 +2,7 @@
 import { TravelIntent } from '../ai-gateway';
 import { longCatClient } from '../longcat-client';
 import { Activity } from '../../../types';
+import { WeatherData } from './weather-agent';
 
 // Re-export Activity for backward compatibility
 export type { Activity };
@@ -14,7 +15,6 @@ export class ActivityAgent {
   }
 
   private loadActivities(): void {
-    // Dubai Activities
     this.activities = [
       {
         id: 'burj-khalifa',
@@ -101,7 +101,6 @@ export class ActivityAgent {
         bookingRequired: false,
         tips: ['Go on weekdays for fewer crowds', 'Try food from different pavilions']
       },
-      // Abu Dhabi Activities
       {
         id: 'sheikh-zayed-grand-mosque',
         name: 'Sheikh Zayed Grand Mosque',
@@ -142,10 +141,9 @@ export class ActivityAgent {
   async getActivities(city: string, intent?: TravelIntent): Promise<Activity[]> {
     try {
       let filteredActivities = this.activities.filter(activity => 
-        activity.location.city.toLowerCase() === city.toLowerCase()
+        (activity.location?.city || activity.city || '').toLowerCase() === city.toLowerCase()
       );
 
-      // Filter based on intent if provided
       if (intent) {
         filteredActivities = this.filterByIntent(filteredActivities, intent);
       }
@@ -160,7 +158,6 @@ export class ActivityAgent {
   private filterByIntent(activities: Activity[], intent: TravelIntent): Activity[] {
     let filtered = [...activities];
 
-    // Filter by interests
     if (intent.interests && intent.interests.length > 0) {
       filtered = filtered.filter(activity => {
         return intent.interests!.some(interest => 
@@ -169,18 +166,16 @@ export class ActivityAgent {
       });
     }
 
-    // Filter by travelers (family-friendly if children)
     if (intent.travelers && intent.travelers.children > 0) {
       filtered = filtered.filter(activity => 
-        activity.suitableFor.includes('families') || activity.suitableFor.includes('kids')
+        (activity.suitableFor || []).includes('families') || (activity.suitableFor || []).includes('kids')
       );
     }
 
-    // Filter by budget
     if (intent.budget) {
       filtered = filtered.filter(activity => {
         const totalCost = this.calculateActivityCost(activity, intent.travelers!);
-        return totalCost <= intent.budget!.amount * 0.3; // Max 30% of budget per activity
+        return totalCost <= intent.budget!.amount * 0.3;
       });
     }
 
@@ -199,11 +194,13 @@ export class ActivityAgent {
     };
 
     const matchingCategories = interestMap[interest.toLowerCase()] || [];
-    return matchingCategories.includes(activity.category);
+    return matchingCategories.includes(activity.category || '');
   }
 
   private calculateActivityCost(activity: Activity, travelers: { adults: number; children: number }): number {
-    return (activity.price.adult * travelers.adults) + (activity.price.child * travelers.children);
+    const price = activity.price;
+    if (!price) return activity.estimatedCostUSD || 0;
+    return (price.adult * travelers.adults) + (price.child * travelers.children);
   }
 
   async getRecommendedItinerary(city: string, intent: TravelIntent, days: number): Promise<Activity[][]> {
@@ -220,7 +217,6 @@ export class ActivityAgent {
 
   private async planDayActivitiesWithAI(availableActivities: Activity[], intent: TravelIntent, dayIndex: number): Promise<Activity[]> {
     try {
-      // Use LongCat AI for intelligent activity planning
       const weather = await this.getWeatherForCity(intent.city || 'dubai');
       const interests = intent.interests || [];
       const budget = intent.budget?.amount || 1000;
@@ -232,7 +228,6 @@ export class ActivityAgent {
         budget
       );
 
-      // Parse AI recommendations and match with available activities
       return this.matchAIRecommendationsToActivities(aiRecommendations, availableActivities, dayIndex);
     } catch (error) {
       console.error('Failed to use AI for activity planning, using fallback:', error);
@@ -240,17 +235,15 @@ export class ActivityAgent {
     }
   }
 
-  private async getWeatherForCity(city: string): Promise<any[]> {
-    // Mock weather data - in production, integrate with weather agent
-    return [
-      {
-        date: new Date().toISOString().split('T')[0],
-        temperature: { average: 32, min: 25, max: 38 },
-        conditions: 'Sunny',
-        humidity: 60,
-        windSpeed: 10
-      }
-    ];
+  private async getWeatherForCity(_city: string): Promise<WeatherData> {
+    return {
+      date: new Date().toISOString().split('T')[0],
+      temperature: { average: 32, min: 25, max: 38 },
+      conditions: 'Sunny',
+      humidity: 60,
+      windSpeed: 10,
+      recommendations: ['Stay hydrated']
+    };
   }
 
   private matchAIRecommendationsToActivities(aiRecommendations: string, availableActivities: Activity[], dayIndex: number): Activity[] {
@@ -258,28 +251,26 @@ export class ActivityAgent {
     let totalHours = 0;
     const maxHours = 8;
 
-    // Simple keyword matching to connect AI recommendations with available activities
     const recommendations = aiRecommendations.toLowerCase();
     
     for (const activity of availableActivities) {
       if (totalHours >= maxHours) break;
       
       const activityName = activity.name.toLowerCase();
-      const activityCategory = activity.category.toLowerCase();
+      const activityCategory = (activity.category || '').toLowerCase();
       
-      // Check if AI recommendation mentions this activity or category
       if (recommendations.includes(activityName) || 
           recommendations.includes(activityCategory) ||
           this.matchesKeywords(recommendations, activity)) {
         
-        if (totalHours + activity.duration <= maxHours) {
+        const dur = activity.duration || activity.durationHours || 2;
+        if (totalHours + dur <= maxHours) {
           dayActivities.push(activity);
-          totalHours += activity.duration;
+          totalHours += dur;
         }
       }
     }
 
-    // If no activities matched, use fallback
     if (dayActivities.length === 0) {
       return this.planDayActivities(availableActivities, { travelers: { adults: 1, children: 0 } } as TravelIntent, dayIndex);
     }
@@ -296,16 +287,15 @@ export class ActivityAgent {
       'indoor': ['indoor', 'air-conditioned', 'building']
     };
 
-    const keywords = keywordMap[activity.category.toLowerCase()] || [];
+    const keywords = keywordMap[(activity.category || '').toLowerCase()] || [];
     return keywords.some(keyword => recommendations.includes(keyword));
   }
 
-  private planDayActivities(availableActivities: Activity[], intent: TravelIntent, dayIndex: number): Activity[] {
+  private planDayActivities(availableActivities: Activity[], _intent: TravelIntent, dayIndex: number): Activity[] {
     const dayActivities: Activity[] = [];
     let totalHours = 0;
-    const maxHours = 8; // Max 8 hours of activities per day
+    const maxHours = 8;
 
-    // Mix of different activity types
     const categories = ['Cultural', 'Adventure', 'Shopping', 'Beach', 'Indoor'];
     let currentCategoryIndex = dayIndex % categories.length;
 
@@ -314,16 +304,15 @@ export class ActivityAgent {
     while (totalHours < maxHours && remainingActivities.length > 0) {
       const targetCategory = categories[currentCategoryIndex];
       const suitableActivities = remainingActivities.filter(activity => 
-        activity.category === targetCategory && 
-        totalHours + activity.duration <= maxHours
+        (activity.category || '') === targetCategory && 
+        totalHours + (activity.duration || activity.durationHours || 2) <= maxHours
       );
 
       if (suitableActivities.length > 0) {
-        const selectedActivity = suitableActivities[0]; // Pick first suitable
+        const selectedActivity = suitableActivities[0];
         dayActivities.push(selectedActivity);
-        totalHours += selectedActivity.duration;
+        totalHours += selectedActivity.duration || selectedActivity.durationHours || 2;
         
-        // Remove selected activity from remaining
         const index = remainingActivities.indexOf(selectedActivity);
         remainingActivities.splice(index, 1);
       }
@@ -336,13 +325,13 @@ export class ActivityAgent {
 
   async searchActivities(query: string, city: string): Promise<Activity[]> {
     const cityActivities = this.activities.filter(activity => 
-      activity.location.city.toLowerCase() === city.toLowerCase()
+      (activity.location?.city || activity.city || '').toLowerCase() === city.toLowerCase()
     );
 
     return cityActivities.filter(activity => 
       activity.name.toLowerCase().includes(query.toLowerCase()) ||
       activity.description.toLowerCase().includes(query.toLowerCase()) ||
-      activity.category.toLowerCase().includes(query.toLowerCase())
+      (activity.category || '').toLowerCase().includes(query.toLowerCase())
     );
   }
 
@@ -352,8 +341,8 @@ export class ActivityAgent {
 
   getActivitiesByCategory(category: string, city: string): Activity[] {
     return this.activities.filter(activity => 
-      activity.location.city.toLowerCase() === city.toLowerCase() &&
-      activity.category.toLowerCase() === category.toLowerCase()
+      (activity.location?.city || activity.city || '').toLowerCase() === city.toLowerCase() &&
+      (activity.category || '').toLowerCase() === category.toLowerCase()
     );
   }
 }

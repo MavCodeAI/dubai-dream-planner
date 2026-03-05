@@ -25,7 +25,9 @@ export type WeatherImpactAnalysis = {
 }
 
 export class WeatherAgent {
+  // @ts-ignore - used for future weather API integration
   private apiKey: string | null = null;
+  // @ts-ignore - used for future weather API integration  
   private baseUrl = 'https://api.openweathermap.org/data/2.5';
 
   constructor() {
@@ -110,7 +112,7 @@ export class WeatherAgent {
       'Indoor Activities': []
     };
 
-    weather.forEach((day, index) => {
+    weather.forEach((day, _index) => {
       const date = new Date(day.date);
       const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
       

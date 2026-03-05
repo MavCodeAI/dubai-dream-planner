@@ -27,10 +27,10 @@ function filterActivities(
 ): Activity[] {
   return activities.filter(activity => {
     // Filter by city
-    if (!cities.includes(activity.city)) return false;
+    if (!cities.includes(activity.city || '')) return false;
     
     // Filter by interests (at least one tag matches)
-    const hasMatchingInterest = activity.tags.some(tag => interests.includes(tag));
+    const hasMatchingInterest = (activity.tags || []).some(tag => interests.includes(tag));
     if (!hasMatchingInterest) return false;
     
     // Family-friendly filter
@@ -62,13 +62,13 @@ function selectActivitiesForDay(
     const slotActivities = shuffledActivities.filter(
       a => (a.timeOfDay === timeSlot || a.timeOfDay === 'anytime') && 
            !selectedActivities.find(s => s.id === a.id) &&
-           dailyCost + a.estimatedCostUSD <= maxBudget
+           dailyCost + (a.estimatedCostUSD || 0) <= maxBudget
     );
     
     if (slotActivities.length > 0) {
       const activity = slotActivities[0];
       selectedActivities.push(activity);
-      dailyCost += activity.estimatedCostUSD;
+      dailyCost += activity.estimatedCostUSD || 0;
       usedActivityIds.add(activity.id);
     }
   }
@@ -77,20 +77,20 @@ function selectActivitiesForDay(
   while (selectedActivities.length < min) {
     const remaining = shuffledActivities.filter(
       a => !selectedActivities.find(s => s.id === a.id) &&
-           dailyCost + a.estimatedCostUSD <= maxBudget
+           dailyCost + (a.estimatedCostUSD || 0) <= maxBudget
     );
     
     if (remaining.length === 0) break;
     
     const activity = remaining[0];
     selectedActivities.push(activity);
-    dailyCost += activity.estimatedCostUSD;
+    dailyCost += activity.estimatedCostUSD || 0;
     usedActivityIds.add(activity.id);
   }
   
   // Sort by time of day
   const timeOrder = { morning: 0, afternoon: 1, evening: 2, anytime: 1.5 };
-  return selectedActivities.sort((a, b) => timeOrder[a.timeOfDay] - timeOrder[b.timeOfDay]);
+  return selectedActivities.sort((a, b) => timeOrder[a.timeOfDay || 'anytime'] - timeOrder[b.timeOfDay || 'anytime']);
 }
 
 export async function generateItinerary(onboardingData: OnboardingData): Promise<Trip> {
@@ -211,8 +211,8 @@ function generateMockItinerary(onboardingData: OnboardingData): Trip {
     if (selectedActivities.length === 0 && cityActivities.length > 0) {
       // Find the cheapest available activity
       const fallbackActivity = cityActivities
-        .filter(a => a.estimatedCostUSD <= dailyBudget)
-        .sort((a, b) => a.estimatedCostUSD - b.estimatedCostUSD)[0];
+        .filter(a => (a.estimatedCostUSD || 0) <= dailyBudget)
+        .sort((a, b) => (a.estimatedCostUSD || 0) - (b.estimatedCostUSD || 0))[0];
       
       if (fallbackActivity) {
         selectedActivities = [fallbackActivity];
@@ -221,7 +221,7 @@ function generateMockItinerary(onboardingData: OnboardingData): Trip {
     }
     
     const dailyCost = selectedActivities.reduce(
-      (sum, a) => sum + a.estimatedCostUSD,
+      (sum, a) => sum + (a.estimatedCostUSD || 0),
       0
     );
     
@@ -343,7 +343,7 @@ function regenerateDayMock(trip: Trip, dayNumber: number): Trip {
   updatedDays[dayIndex] = {
     ...day,
     activities: newActivities,
-    dailyCostUSD: newActivities.reduce((sum, a) => sum + a.estimatedCostUSD, 0),
+    dailyCostUSD: newActivities.reduce((sum, a) => sum + (a.estimatedCostUSD || 0), 0),
   };
   
   const totalCost = updatedDays.reduce((sum, d) => sum + d.dailyCostUSD, 0);

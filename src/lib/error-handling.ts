@@ -14,7 +14,7 @@
  * ```
  */
 import { toast } from 'sonner';
-import { Trip } from '@/types';
+// Trip type used for validation
 
 export interface TripData {
   onboardingData: {

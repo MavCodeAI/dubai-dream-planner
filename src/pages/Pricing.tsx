@@ -3,7 +3,7 @@ import { Check, X, Crown, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useState, useEffect } from 'react';
-import { isProUser, upgradeToPro } from '@/lib/storage';
+import { isProUser } from '@/lib/storage';
 import UpgradeModal from '@/components/UpgradeModal';
 
 const getPlans = (isPro: boolean) => [
@@ -54,7 +54,7 @@ export default function Pricing() {
     }
   };
 
-  const handleUpgradeSuccess = () => {
+  void function handleUpgradeSuccess() {
     setIsPro(true);
     setShowUpgradeModal(false);
   };

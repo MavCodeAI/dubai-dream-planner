@@ -4,8 +4,7 @@ import {
   Map, 
   Calendar, 
   Bookmark, 
-  DollarSign,
-  Printer
+  DollarSign
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

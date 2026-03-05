@@ -94,14 +94,14 @@ export class LanguageDetector {
     let formalScore = 0;
     let casualScore = 0;
 
-    const formalWords = formalIndicators[language] || [];
-    const casualWords = casualIndicators[language] || [];
+    const formalWords: string[] = (formalIndicators as Record<string, string[]>)[language] || [];
+    const casualWords: string[] = (casualIndicators as Record<string, string[]>)[language] || [];
 
-    formalWords.forEach(indicator => {
+    formalWords.forEach((indicator: string) => {
       if (text.includes(indicator)) formalScore++;
     });
 
-    casualWords.forEach(indicator => {
+    casualWords.forEach((indicator: string) => {
       if (text.includes(indicator)) casualScore++;
     });
 
@@ -196,7 +196,8 @@ You're a helpful AI! Just chat naturally in English.
       }
     };
 
-    const systemPrompt = languageInstructions[responseLanguage][writingStyle][taskType];
+    const style = writingStyle === 'mixed' ? 'casual' : writingStyle;
+    const systemPrompt = (languageInstructions[responseLanguage] as Record<string, Record<string, string>>)[style][taskType];
     
     return {
       systemPrompt: systemPrompt + basePrompt,
@@ -204,7 +205,7 @@ You're a helpful AI! Just chat naturally in English.
     };
   }
 
-  private adaptUserPrompt(basePrompt: string, language: 'urdu' | 'english', style: 'formal' | 'casual' | 'mixed'): string {
+  private adaptUserPrompt(basePrompt: string, language: 'urdu' | 'english', _style: 'formal' | 'casual' | 'mixed'): string {
     if (language === 'urdu') {
       return `براہ کرم اس پیغام کا جواب دیں: ${basePrompt}`;
     } else {
@@ -212,40 +213,8 @@ You're a helpful AI! Just chat naturally in English.
     }
   }
 
-  formatResponse(response: string, languageContext: LanguageContext): string {
-    const { responseLanguage, writingStyle } = languageContext;
-
-    // Add appropriate greeting/closing based on language and style
-    const greetings = {
-      urdu: {
-        formal: '',
-        casual: ''
-      },
-      english: {
-        formal: '',
-        casual: ''
-      }
-    };
-
-    const closings = {
-      urdu: {
-        formal: '\n\nآپ کی مدد کے لیے حاضر ہیں۔',
-        casual: '\n\nاور کوئی سوال؟'
-      },
-      english: {
-        formal: '\n\nI\'m here to help with your travel needs.',
-        casual: '\n\nAny other questions?'
-      }
-    };
-
-    // Format response based on detected language
-    if (responseLanguage === 'urdu') {
-      // Ensure Urdu text is properly formatted
-      return response.trim();
-    } else {
-      // Ensure English text is properly formatted
-      return response.trim();
-    }
+  formatResponse(response: string, _languageContext: LanguageContext): string {
+    return response.trim();
   }
 
   // Method to get language-specific error messages

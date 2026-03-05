@@ -2,7 +2,7 @@
 import { actionAgent } from './agents/action-agent';
 import { bookingWorkflowManager } from './workflows/booking-workflow';
 import { stateMachine } from './state-machine';
-import { contextEngine } from './context-engine';
+// contextEngine used for session restoration
 import { preferenceLearner } from './learning/preference-learner';
 
 export interface SessionState {

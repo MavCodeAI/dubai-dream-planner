@@ -1,6 +1,6 @@
 import { StepContainer } from './StepIndicator';
 import { Button } from '@/components/ui/button';
-import { User, Users, Heart, Minus, Plus } from 'lucide-react';
+import { User, Users, Minus, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TRIP_TYPES } from '@/types';
 import { DynamicIcon } from '../DynamicIcon';

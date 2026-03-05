@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { PlanningAgent } from '../lib/agentic/agents/planning-agent';
 import type { TravelIntent } from '../lib/agentic/ai-gateway';
-import type { Activity } from '../types';
+// Activity type imported from types
 
 describe('PlanningAgent', () => {
   let planningAgent: PlanningAgent;
@@ -218,13 +218,13 @@ describe('PlanningAgent', () => {
       if (itinerary.days[0].activities.length > 1) {
         const activityAreas = ['Zabeel', 'Al Quoz', 'Marina'];
         itinerary.days[0].activities.forEach((pa, i) => {
-          pa.activity.location.area = activityAreas[i % activityAreas.length];
+          pa.activity.location!.area = activityAreas[i % activityAreas.length];
         });
         
         const optimized = await planningAgent.optimizeItinerary(itinerary, intent);
         
         // Activities should be sorted alphabetically by area
-        const sortedAreas = optimized.days[0].activities.map(pa => pa.activity.location.area);
+        const sortedAreas = optimized.days[0].activities.map(pa => pa.activity.location!.area);
         const expectedOrder = [...sortedAreas].sort();
         expect(sortedAreas).toEqual(expectedOrder);
       }

@@ -1,5 +1,5 @@
 // Booking Workflow Manager - Multi-step transaction manager for bookings, confirmations, and modifications
-import { ActionType, Action, actionAgent, ActionParams } from '../agents/action-agent';
+import { Action, actionAgent, ActionParams } from '../agents/action-agent';
 
 export type WorkflowType = 'booking' | 'cancellation' | 'modification';
 export type WorkflowStatus = 

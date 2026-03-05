@@ -152,7 +152,7 @@ export default function Print() {
                 </div>
               ) : (
                 <div className="activity-list">
-                  {day.activities.map((activity, index) => (
+                  {day.activities.map((activity) => (
                     <div key={activity.id} className="activity-item">
                       <div className="activity-time">
                         <Clock className="w-4 h-4" />

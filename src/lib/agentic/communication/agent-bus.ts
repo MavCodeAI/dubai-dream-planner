@@ -125,7 +125,7 @@ class AgentBus {
     const correlationId = 'corr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     const tempAgentId = 'temp_' + Date.now();
     
-    const message = await this.send({
+    /* const message = */ await this.send({
       from: tempAgentId,
       to,
       type: 'request',
