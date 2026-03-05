@@ -21,7 +21,6 @@ import {
   MapPin,
   Trash2,
   Eye,
-  Compass,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { toast } from 'sonner';

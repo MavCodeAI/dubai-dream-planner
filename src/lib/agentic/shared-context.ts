@@ -63,7 +63,7 @@ class SharedContextStore {
     // Last-write-wins strategy
     this.registerMergeStrategy({
       name: 'last_write_wins',
-      resolve: (local, remote) => remote
+      resolve: (_local, remote) => remote
     });
 
     // First-write-wins strategy

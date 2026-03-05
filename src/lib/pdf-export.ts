@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { parseISO } from 'date-fns';
-import { Trip, DayPlan } from '@/types';
+import { Trip } from '@/types';
 
 export async function exportToPDF(trip: Trip): Promise<void> {
   try {
@@ -95,7 +95,7 @@ export async function exportToPDF(trip: Trip): Promise<void> {
         const details = [
           `Duration: ${activity.durationHours} hours`,
           `Cost: $${activity.estimatedCostUSD}`,
-          `Best time: ${activity.timeOfDay.charAt(0).toUpperCase() + activity.timeOfDay.slice(1)}`,
+          `Best time: ${(activity.timeOfDay || 'anytime').charAt(0).toUpperCase() + (activity.timeOfDay || 'anytime').slice(1)}`,
           `Family friendly: ${activity.familyFriendly ? 'Yes' : 'No'}`
         ];
 

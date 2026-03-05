@@ -1,9 +1,6 @@
 // Trigger System Implementation - Manages time-based, event-based, and behavior-based triggers
 import { 
   TriggerDefinition,
-  TimeTriggerDefinition,
-  EventTriggerDefinition,
-  BehaviorTriggerDefinition,
   RuntimeTrigger,
   TriggerInstance,
   TriggerAction,

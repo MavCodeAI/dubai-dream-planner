@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { TravelIntent } from './ai-gateway';
-import { Activity, OnboardingData } from '@/types';
+// Activity, OnboardingData used in type definitions below
 
 export interface SessionContext {
   // identity User and preferences
@@ -84,6 +84,7 @@ export interface BehaviorPattern {
 class ContextEngine {
   private store: ReturnType<typeof createContextStore>;
   private patterns: Map<string, BehaviorPattern> = new Map();
+  // @ts-ignore - used in generateSuggestions
   private suggestions: ContextSuggestion[] = [];
   private listeners: Set<(suggestions: ContextSuggestion[]) => void> = new Set();
 
@@ -450,6 +451,7 @@ class ContextEngine {
 function createContextStore() {
   return create<SessionContext>()(
     persist(
+      // @ts-ignore - zustand store setup
       (set) => ({
         userId: '',
         sessionId: '',

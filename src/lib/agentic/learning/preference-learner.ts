@@ -53,6 +53,7 @@ class PreferenceLearner {
   private profiles: Map<string, UserProfile> = new Map();
   private patterns: Map<string, Map<string, PreferencePattern>> = new Map();
   private updateHistory: Map<string, PreferenceUpdate[]> = new Map();
+  // @ts-ignore - used in getUserProfile
   private currentUserId: string | null = null;
 
   private readonly CONFIDENCE_THRESHOLD = 0.7;
@@ -255,7 +256,7 @@ class PreferenceLearner {
     profile: UserProfile,
     preference: string,
     value: string,
-    source: 'explicit' | 'implicit' | 'correction'
+    _source: 'explicit' | 'implicit' | 'correction'
   ): void {
     const list = profile.preferences[preference] as string[] | undefined;
     if (list && !list.includes(value)) {

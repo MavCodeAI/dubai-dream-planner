@@ -19,7 +19,7 @@ describe('ActivityAgent', () => {
       
       // All activities should be in Dubai
       activities.forEach(activity => {
-        expect(activity.location.city.toLowerCase()).toBe('dubai');
+        expect(activity.location!.city.toLowerCase()).toBe('dubai');
       });
     });
 
@@ -31,7 +31,7 @@ describe('ActivityAgent', () => {
       expect(activities.length).toBeGreaterThan(0);
       
       activities.forEach(activity => {
-        expect(activity.location.city.toLowerCase()).toBe('abu-dhabi');
+        expect(activity.location!.city.toLowerCase()).toBe('abu-dhabi');
       });
     });
 
@@ -185,7 +185,7 @@ describe('ActivityAgent', () => {
       const itinerary = await activityAgent.getRecommendedItinerary('dubai', intent, 2);
       
       itinerary.forEach(dayActivities => {
-        const totalHours = dayActivities.reduce((sum, a) => sum + a.duration, 0);
+        const totalHours = dayActivities.reduce((sum, a) => sum + (a.duration || 0), 0);
         expect(totalHours).toBeLessThanOrEqual(12); // Allow some buffer
       });
     });
@@ -214,9 +214,9 @@ describe('ActivityAgent', () => {
       const activities = await activityAgent.getActivities('dubai');
       
       activities.forEach(activity => {
-        expect(typeof activity.price.adult).toBe('number');
-        expect(typeof activity.price.child).toBe('number');
-        expect(typeof activity.price.currency).toBe('string');
+        expect(typeof activity.price!.adult).toBe('number');
+        expect(typeof activity.price!.child).toBe('number');
+        expect(typeof activity.price!.currency).toBe('string');
       });
     });
 
@@ -224,8 +224,8 @@ describe('ActivityAgent', () => {
       const activities = await activityAgent.getActivities('dubai');
       
       activities.forEach(activity => {
-        expect(typeof activity.location.city).toBe('string');
-        expect(typeof activity.location.area).toBe('string');
+        expect(typeof activity.location!.city).toBe('string');
+        expect(typeof activity.location!.area).toBe('string');
       });
     });
   });

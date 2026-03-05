@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Activity, OnboardingData } from '@/types';
+import { Activity } from '@/types';
 
 interface AIError {
   error: string;

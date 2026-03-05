@@ -2,7 +2,7 @@
 // This handles LLM calls through multiple providers with fallback support
 
 import { longCatClient } from './longcat-client';
-import { languageDetector, LanguageContext } from './language-detector';
+import { languageDetector } from './language-detector';
 
 interface AIResponse {
   content: string;
