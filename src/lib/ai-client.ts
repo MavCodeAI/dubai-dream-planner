@@ -104,10 +104,11 @@ export const aiClient = {
    * console.log(response.response);
    * ```
    */
-  chat: async (message: string, context?: string): Promise<ChatResponse> => {
-    console.log('Calling ai-chat edge function...');
+  chat: async (message: string, context?: string, provider: 'lovable' | 'grok' = 'lovable'): Promise<ChatResponse> => {
+    const functionName = provider === 'grok' ? 'ai-grok' : 'ai-chat';
+    console.log(`Calling ${functionName} edge function...`);
     
-    const { data, error } = await supabase.functions.invoke<ChatResponse | AIError>('ai-chat', {
+    const { data, error } = await supabase.functions.invoke<ChatResponse | AIError>(functionName, {
       body: { message, context }
     });
 

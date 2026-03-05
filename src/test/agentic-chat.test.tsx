@@ -34,6 +34,7 @@ vi.mock('../lib/agentic/language-detector', () => ({
   }
 }));
 
+describe('AgenticChat', () => {
   afterEach(() => {
     vi.resetAllMocks();
   });
